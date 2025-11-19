@@ -1,47 +1,41 @@
-let lastTapped = null;     // 直前にタップされたスイカ
-let answer = Math.floor(Math.random() * 3);  // チャーが潜む位置（0,1,2）
-
 const luntu = document.getElementById("luntu");
-const message = document.getElementById("message");
-const panels = document.querySelectorAll(".panel");
+const watermelons = [
+  document.getElementById("w0"),
+  document.getElementById("w1"),
+  document.getElementById("w2")
+];
 
-panels.forEach(panel => {
-  panel.addEventListener("click", () => {
-    const id = Number(panel.dataset.id);
+let charIndex = Math.floor(Math.random() * 3); // 当たりスイカ
+let lastClicked = -1;
 
-    // ルントウをスイカ位置に移動
-    const rect = panel.getBoundingClientRect();
-    const parentRect = document.getElementById("game").getBoundingClientRect();
-    const centerX = rect.left - parentRect.left + rect.width / 2;
-    luntu.style.left = `${centerX}px`;
+function moveLuntuTo(target) {
+  luntu.style.left = target.offsetLeft + "px";
+  luntu.style.top = (target.offsetTop + 70) + "px";
+}
 
-    // 初回タップ → 移動のみ
-    if (lastTapped !== id) {
-      lastTapped = id;
-      message.textContent = "";
+watermelons.forEach((wm, index) => {
+  wm.addEventListener("click", () => {
+    // 1回目タップ：移動のみ
+    if (lastClicked !== index) {
+      lastClicked = index;
+      moveLuntuTo(wm);
       return;
     }
 
-    // 二回目タップ → 判定
-    if (id === answer) {
-      message.textContent = "チャーをたおした！";
-      disableAll();
-    } else {
-      message.textContent = "チャーはいなかった…";
+    // 2回目タップ：判定
+    luntu.classList.add("jump"); // ルントウジャンプ
+    setTimeout(() => luntu.classList.remove("jump"), 250);
 
-      // そのスイカを無効化
-      panel.classList.add("disabled");
-      panel.style.pointerEvents = "none";
+    wm.classList.add("flash"); // スイカ点滅
 
-      // ロック解除
-      lastTapped = null;
-    }
+    setTimeout(() => {
+      if (index === charIndex) {
+        alert("チャーをたおした！");
+      } else {
+        alert("チャーはいなかった…");
+        wm.style.display = "none"; // 消去
+      }
+      lastClicked = null; // 次のクリック用にリセット
+    }, 900);
   });
 });
-
-function disableAll() {
-  panels.forEach(p => {
-    p.style.pointerEvents = "none";
-  });
-}
-
