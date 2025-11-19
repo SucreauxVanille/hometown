@@ -1,45 +1,50 @@
 body {
-  font-family: sans-serif;
-  text-align: center;
-  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #f0f0f0;
+  margin: 0;
 }
 
 #game {
   position: relative;
-  display: inline-block;
+  width: 400px;
+  height: 250px;
+}
+
+.watermelon {
+  width: 80px;
+  cursor: pointer;
+  position: absolute;
+  transition: opacity 0.2s;
 }
 
 #luntu {
-  width: 100px;
+  width: 80px;
   position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  transition: left 0.3s ease;
-  pointer-events: none;   /* ← これを追加 */
+  transition: left 0.4s, top 0.4s, transform 0.2s;
+  pointer-events: none; /* クリックを貫通させる */
 }
 
-#panels {
-  margin-top: 120px;
-  display: flex;
-  gap: 30px;
-  justify-content: center;
+/* ▼ スイカ点滅アニメーション */
+@keyframes flash {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+  100% { opacity: 1; }
 }
 
-.panel {
-  font-size: 40px;
-  cursor: pointer;
-  user-select: none;
-  width: 60px;
-  height: 60px;
+.flash {
+  animation: flash 0.3s ease-in-out 3;
 }
 
-.panel.disabled {
-  visibility: hidden;
+/* ▼ ルントウのジャンプアニメーション */
+.jump {
+  animation: jumpAnim 0.25s ease-out;
 }
 
-#message {
-  margin-top: 20px;
-  font-size: 20px;
-  height: 1.5em;
+@keyframes jumpAnim {
+  0%   { transform: translateY(0); }
+  30%  { transform: translateY(-20px); }
+  100% { transform: translateY(0); }
 }
