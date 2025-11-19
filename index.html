@@ -1,22 +1,122 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>ルントウのスイカ退治</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8" />
+<title>スイカとルントウ</title>
+<style>
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: #f0f0f0;
+  }
+
+  #game {
+    position: relative;
+    width: 400px;
+    height: 250px;
+  }
+
+  .watermelon {
+    width: 80px;
+    cursor: pointer;
+    position: absolute;
+    transition: opacity 0.2s;
+  }
+
+  #luntu {
+    width: 80px;
+    position: absolute;
+    transition: left 0.4s, top 0.4s, transform 0.2s;
+  }
+
+  /* ▼ スイカ点滅アニメーション */
+  @keyframes flash {
+    0% { opacity: 1; }
+    50% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+
+  .flash {
+    animation: flash 0.3s ease-in-out 3;
+  }
+
+  /* ▼ ルントウのジャンプアニメーション */
+  .jump {
+    animation: jumpAnim 0.25s ease-out;
+  }
+
+  @keyframes jumpAnim {
+    0%   { transform: translateY(0); }
+    30%  { transform: translateY(-20px); }
+    100% { transform: translateY(0); }
+  }
+
+</style>
 </head>
 <body>
 
-  <div id="game">
-    <img id="luntu" src="luntu.png" alt="ルントウ">
+<div id="game">
+  <!-- ▼ スイカ3つ（画像差し替え） -->
+  <img src="watermelon.png" class="watermelon" id="w0" style="left:20px; top:80px;">
+  <img src="watermelon.png" class="watermelon" id="w1" style="left:160px; top:80px;">
+  <img src="watermelon.png" class="watermelon" id="w2" style="left:300px; top:80px;">
 
-    <div id="panels">
-      <div class="panel" data-id="0">●</div>
-      <div class="panel" data-id="1">●</div>
-      <div class="panel" data-id="2">●</div>
-    </div>
-  </div>
+  <!-- ▼ ルントウ -->
+  <img src="luntu.png" id="luntu" style="left:160px; top:150px;">
+</div>
+
+<script>
+  let luntu = document.getElementById("luntu");
+  let watermelons = [
+    document.getElementById("w0"),
+    document.getElementById("w1"),
+    document.getElementById("w2")
+  ];
+
+  let charIndex = Math.floor(Math.random() * 3); // 当たりのスイカ
+  let lastClicked = -1;
+
+  function moveLuntuTo(target) {
+    luntu.style.left = target.offsetLeft + "px";
+    luntu.style.top = (target.offsetTop + 70) + "px";
+  }
+
+  watermelons.forEach((wm, index) => {
+    wm.addEventListener("click", () => {
+      // 1回目タップ：移動のみ
+      if (lastClicked !== index) {
+        lastClicked = index;
+        moveLuntuTo(wm);
+        return;
+      }
+
+      // 2回目タップ（当たり判定）
+      luntu.classList.add("jump"); // ルントウジャンプ
+      setTimeout(() => luntu.classList.remove("jump"), 250);
+
+      if (index === charIndex) {
+        // 当たり！
+        wm.classList.add("flash");
+        setTimeout(() => {
+          alert("チャーをたおした！");
+          wm.style.display = "none";
+        }, 900);
+      } else {
+        // ハズレ
+        wm.classList.add("flash");
+        setTimeout(() => {
+          alert("チャーはいなかった…");
+          wm.style.display = "none";
+        }, 900);
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
 
   <div id="message"></div>
 
