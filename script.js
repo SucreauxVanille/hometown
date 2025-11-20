@@ -93,7 +93,7 @@ watermelons.forEach((wm, index) => {
     }
 
     // 2回目タップ：攻撃演出
-    await showAttackMessage(700);
+    await showAttackMessage(400);
 
     luntu.classList.add("jump");
     wm.classList.add("flash");
