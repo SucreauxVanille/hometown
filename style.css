@@ -10,29 +10,22 @@ body {
 #game {
   position: relative;
   width: 400px;
-  margin: auto;
+  height: 300px;
 }
 
-.luntu {
+/* ルントウ */
+#luntu {
   position: absolute;
   width: 80px;
-  z-index: 5;
+  transition: left 0.4s, top 0.4s, transform 0.2s;
 }
 
+/* スイカ */
 .watermelon {
   position: absolute;
   width: 120px;
-  z-index: 3;
-}
-
-/* 画面下部のメッセージウインドウ固定 */
-.message {
-  position: absolute;
-  bottom: 0px;
-  left: 0;
-  width: 400px;
-  display: none;
-  z-index: 10;
+  cursor: pointer;
+  transition: opacity 0.2s;
 }
 
 /* ▼ スイカ点滅アニメーション */
@@ -46,13 +39,28 @@ body {
   animation: flash 0.3s ease-in-out 3;
 }
 
-/* ▼ ルントウのジャンプアニメーション */
-.jump {
-  animation: jumpAnim 0.25s ease-out;
-}
-
+/* ▼ ルントウジャンプアニメーション */
 @keyframes jumpAnim {
   0%   { transform: translateY(0); }
   30%  { transform: translateY(-20px); }
   100% { transform: translateY(0); }
+}
+
+.jump {
+  animation: jumpAnim 0.25s ease-out;
+}
+
+/* ▼ メッセージウインドウ */
+.message-window {
+  position: absolute;
+  bottom: 0px;
+  left: 0;
+  width: 400px;
+  display: none;
+  cursor: pointer;
+  z-index: 999; /* 画面上最前面 */
+}
+
+.message-window img {
+  width: 100%;
 }
