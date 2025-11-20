@@ -1,20 +1,79 @@
 // ============================================
-// ▼ DOM取得
+// ▼ ユーティリティ
+// ============================================
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// -----------------------------
+// メッセージ表示
+// -----------------------------
+function showMessage(imgName, onClick = null) {
+  msgImage.src = imgName;
+  msgWindow.style.display = "block";
+  msgWindow.onclick = () => {
+    msgWindow.style.display = "none";
+    if (onClick) onClick();
+  };
+}
+
+// ============================================
+// ▼ オープニング・イントロ制御
 // ============================================
 const opening = document.getElementById("opening");
 const openingPress = document.getElementById("openingPress");
-const game = document.getElementById("game");
 const curtainLeft = document.getElementById("curtainLeft");
 const curtainRight = document.getElementById("curtainRight");
-const msgWindow = document.getElementById("messageWindow");
-const msgImage = document.getElementById("messageImage");
+const introImage = "intro.png"; // イントロ画像
+let openingActive = true;
 
+async function startOpeningSequence() {
+  if (!openingActive) return;
+  openingActive = false;
+
+  // press点滅
+  openingPress.classList.add("press-flash");
+  await delay(600);
+
+  // 暗転開始
+  curtainLeft.classList.add("curtain-show");
+  curtainRight.classList.add("curtain-show");
+  await delay(400); // 暗転完了待機
+
+  // イントロ表示
+  await new Promise(resolve => {
+    showMessage(introImage, resolve);
+  });
+
+  // カーテンオープン
+  curtainLeft.classList.add("curtain-open-left");
+  curtainRight.classList.add("curtain-open-right");
+  await delay(1000);
+
+  // カーテン非表示
+  curtainLeft.style.display = "none";
+  curtainRight.style.display = "none";
+
+  // ゲーム画面表示
+  game.style.display = "block";
+  initGame();
+}
+
+// pressクリックでオープニング開始
+openingPress.addEventListener("click", startOpeningSequence);
+
+// ============================================
+// ▼ ゲーム本編
+// ============================================
+const game = document.getElementById("game");
 const luntu = document.getElementById("luntu");
 const watermelons = [
   document.getElementById("w0"),
   document.getElementById("w1"),
   document.getElementById("w2")
 ];
+const msgWindow = document.getElementById("messageWindow");
+const msgImage = document.getElementById("messageImage");
 
 // 画像ファイル名
 const MSG_START = "start.png";
@@ -26,41 +85,25 @@ const MSG_HIT3 = "hit3.png";
 const MSG_CLEAR = "clear.png";
 const MSG_GAMEOVER = "gameover.png";
 
-let charIndex = 0;       // 当たりスイカ
-let lastClicked = -1;    // 前回クリック
-let gameEnabled = false; // ゲーム開始判定
-let missCount = 0;       // 異なるハズレ回数
-let missedIndexes = new Set(); // ハズレスイカindex管理
-let repeatCount = 0;     // 連続クリック回数
-let openingActive = true; // オープニング処理中フラグ
+let charIndex = 0;       
+let lastClicked = -1;    
+let gameEnabled = false; 
+let missCount = 0;       
+let missedIndexes = new Set(); 
+let repeatCount = 0;     
 
-// ============================================
-// ▼ 共通：メッセージ表示
-// ============================================
-function showMessage(imgName, onClick = null) {
-  msgImage.src = imgName;
-  msgWindow.style.display = "block";
-  msgWindow.onclick = () => {
-    msgWindow.style.display = "none";
-    if (onClick) onClick();
-  };
-}
-
-// ============================================
-// ▼ ゲーム初期化
-// ============================================
+// -----------------------------
+// ゲーム初期化
+// -----------------------------
 function initGame() {
-  // スイカ復活
   watermelons.forEach(w => {
     w.style.display = "block";
     w.classList.remove("flash");
   });
 
-  // ルントウ初期位置
   luntu.style.left = "150px";
   luntu.style.top = "60px";
 
-  // 当たり再抽選
   charIndex = Math.floor(Math.random() * 3);
   lastClicked = -1;
   missCount = 0;
@@ -73,9 +116,9 @@ function initGame() {
   });
 }
 
-// ============================================
-// ▼ ルントウ移動：スイカ中央＋y位置調整
-// ============================================
+// -----------------------------
+// ルントウ移動
+// -----------------------------
 function moveLuntuTo(target) {
   const targetCenterX = target.offsetLeft + target.offsetWidth / 2;
   const luntuLeft = targetCenterX - luntu.offsetWidth / 2;
@@ -84,112 +127,35 @@ function moveLuntuTo(target) {
   luntu.style.top = `${luntuTop}px`;
 }
 
-// ============================================
-// ▼ 攻撃演出（短時間表示）
-// ============================================
-function showAttackMessage(duration = 700) {
-  return new Promise(resolve => {
-    gameEnabled = false;
-    showMessage(MSG_ATTACK);
-    setTimeout(() => {
-      msgWindow.style.display = "none";
-      gameEnabled = true;
-      resolve();
-    }, duration);
-  });
+// -----------------------------
+// 攻撃演出
+// -----------------------------
+async function showAttackMessage(duration = 700) {
+  gameEnabled = false;
+  showMessage(MSG_ATTACK);
+  await delay(duration);
+  msgWindow.style.display = "none";
+  gameEnabled = true;
 }
 
-// ============================================
-// ▼ 当たり演出（hit → hit2 → hit3 → clear）
-// ============================================
+// -----------------------------
+// 当たり演出(hit → hit2 → hit3 → clear)
+// -----------------------------
 async function playHitSequence() {
   gameEnabled = false;
   showMessage(MSG_HIT1);
-  await new Promise(r => setTimeout(r, 600));
+  await delay(600);
   showMessage(MSG_HIT2);
-  await new Promise(r => setTimeout(r, 600));
-  showMessage(MSG_HIT3, () => {
-    // クリックでclear表示 → クリックでオープニングに戻る
-    showMessage(MSG_CLEAR, () => returnToOpening());
+  await delay(600);
+  showMessage(MSG_HIT3, async () => {
+    showMessage(MSG_CLEAR, startOpeningSequence); // clear後はオープニングへ
     gameEnabled = true;
   });
 }
 
-// ============================================
-// ▼ クリア／ゲームオーバー後オープニング戻し
-// ============================================
-function returnToOpening() {
-  gameEnabled = false;
-
-  // カーテンリセット
-  curtainLeft.style.display = "block";
-  curtainRight.style.display = "block";
-  curtainLeft.className = "curtain";
-  curtainRight.className = "curtain";
-
-  // オブジェクト初期位置リセット
-  luntu.style.left = "150px";
-  luntu.style.top = "60px";
-  watermelons.forEach(w => {
-    w.style.display = "block";
-    w.classList.remove("flash");
-  });
-
-  // ゲーム画面非表示 → オープニング表示
-  game.style.display = "none";
-  opening.style.display = "block";
-  openingActive = true;
-}
-
-// ============================================
-// ▼ オープニング画面制御（イントロ付き）
-// ============================================
-opening.addEventListener("click", () => {
-  if (!openingActive) return;
-  openingActive = false;
-
-  // press点滅
-  openingPress.classList.add("press-flash");
-
-  setTimeout(() => {
-    // 暗転開始
-    curtainLeft.classList.add("curtain-show");
-    curtainRight.classList.add("curtain-show");
-
-    setTimeout(() => {
-      // イントロ画像表示（クリックで閉じる）
-      const intro = document.createElement("img");
-      intro.src = "intro.png";
-      intro.id = "introMessage";
-      intro.style.position = "absolute";
-      intro.style.top = "20px";
-      intro.style.left = "50%";
-      intro.style.transform = "translateX(-50%)";
-      intro.style.zIndex = "1000";
-      document.body.appendChild(intro);
-
-      intro.addEventListener("click", () => {
-        intro.remove();
-
-        // カーテン開放
-        curtainLeft.classList.add("curtain-open-left");
-        curtainRight.classList.add("curtain-open-right");
-
-        setTimeout(() => {
-          curtainLeft.style.display = "none";
-          curtainRight.style.display = "none";
-
-          // ゲーム開始
-          initGame();
-        }, 1000);
-      });
-    }, 500); // 暗転完了待機
-  }, 600); // press点滅時間
-});
-
-// ============================================
-// ▼ メイン：スイカクリック処理
-// ============================================
+// -----------------------------
+// スイカクリック処理
+// -----------------------------
 watermelons.forEach((wm, index) => {
   wm.addEventListener("click", async () => {
     if (!gameEnabled) return;
@@ -199,7 +165,7 @@ watermelons.forEach((wm, index) => {
     else repeatCount++;
     if (repeatCount >= 2) return;
 
-    // 1回目：移動のみ
+    // 1回目：移動
     if (lastClicked !== index) {
       lastClicked = index;
       moveLuntuTo(wm);
@@ -211,7 +177,7 @@ watermelons.forEach((wm, index) => {
 
     luntu.classList.add("jump");
     wm.classList.add("flash");
-    await new Promise(r => setTimeout(r, 300));
+    await delay(300);
     luntu.classList.remove("jump");
     wm.classList.remove("flash");
 
@@ -227,7 +193,7 @@ watermelons.forEach((wm, index) => {
 
       if (missCount >= 2) {
         showMessage(MSG_MISS, () => {
-          showMessage(MSG_GAMEOVER, () => returnToOpening());
+          showMessage(MSG_GAMEOVER, startOpeningSequence);
         });
       } else {
         showMessage(MSG_MISS);
@@ -238,7 +204,9 @@ watermelons.forEach((wm, index) => {
   });
 });
 
-// ============================================
-// ▼ ページロードで初期化
-// ============================================
+// -----------------------------
+// ページロードで初期化
+// -----------------------------
+game.style.display = "none"; // 最初は非表示
 initGame();
+
