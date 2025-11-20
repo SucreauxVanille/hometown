@@ -83,7 +83,7 @@ body {
   align-items: center;
   justify-content: flex-start;
   overflow: hidden;
-  z-index: 9999;
+  z-index: 5000;
 }
 
 /* ▼ ルントウ（背景用・大きく拡大） */
@@ -140,7 +140,7 @@ body {
   width: 50%;
   height: 100%;
   background: black;
-  z-index: 5000;
+  z-index: 6000;
   pointer-events: none;
   transform: translateX(0);
   opacity: 0;          /* 最初は透明 */
