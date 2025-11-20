@@ -140,7 +140,7 @@ body {
   width: 50%;
   height: 100%;
   background: black;
-  z-index: 12000;
+  z-index: 5000;
   pointer-events: none;
   transform: translateX(0);
   opacity: 0;          /* 最初は透明 */
@@ -180,7 +180,7 @@ body {
   max-width: 400px;
   opacity: 0;
   transition: opacity 1s ease-in-out; /* フェードイン/アウト */
-  z-index: 500;  /* メッセージウインドウより下 */
+  z-index: 9999;  /* メッセージウインドウより下 */
   display: none;
 }
 
@@ -191,7 +191,7 @@ body {
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.8s ease;
-  z-index: 9999;
+  z-index: 8000;
 }
 .fade-active {
   opacity: 1;
