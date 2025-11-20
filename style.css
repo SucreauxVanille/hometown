@@ -16,7 +16,7 @@ body {
 /* ルントウ */
 #luntu {
   position: absolute;
-  width: 120px;
+  width: 150px;
   transition: left 0.4s, top 0.4s, transform 0.2s;
 }
 
@@ -55,12 +55,15 @@ body {
   position: absolute;
   bottom: 0px;
   left: 0;
-  width: 400px;
+  width: 400px;       /* PC用固定幅 */
+  max-width: 100%;    /* 画面幅より大きくならない */
   display: none;
   cursor: pointer;
-  z-index: 999; /* 画面上最前面 */
+  z-index: 999;       /* 最前面 */
 }
 
 .message-window img {
-  width: 100%;
+  width: 100%;       /* 親要素幅に合わせる */
+  height: auto;      /* 縦横比維持 */
+  display: block;
 }
