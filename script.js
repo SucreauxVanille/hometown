@@ -169,28 +169,29 @@ async function playHitSequence() {
 const deku = document.getElementById("deku"); // 老いたルントウ画像
 
 // ==============================
-// ゲームオーバー演出：ルントウ老化
+// ゲームオーバー演出：ルントウ老化（luntu追従版）
 // ==============================
 async function playGameOverSequence() {
   gameEnabled = false; // 操作禁止
   msgWindow.style.display = "block";
   msgImage.src = MSG_GAMEOVER;
 
-  // luntuとdeku重ねて点滅開始
   deku.style.display = "block";
   deku.style.opacity = 0;
-  let opacity = 0;
-  let step = 0.05;
-  let intervalTime = 200; // 初期点滅速度
+  
+  // luntuの位置にdekuを追従させる
+  const followInterval = setInterval(() => {
+    deku.style.left = luntu.offsetLeft + "px";
+    deku.style.top = luntu.offsetTop + "px";
+  }, 50);
+
+  let intervalTime = 200;
 
   // luntuとdekuの交互点滅
   for (let i = 0; i < 20; i++) {
-    opacity = i % 2 === 0 ? 1 : 0;
-    luntu.style.opacity = opacity;
-    deku.style.opacity = 1 - opacity;
+    luntu.style.opacity = i % 2 === 0 ? 1 : 0;
+    deku.style.opacity = 1 - luntu.style.opacity;
     await new Promise(r => setTimeout(r, intervalTime));
-
-    // 点滅速度を徐々に上げる
     if (i === 9) intervalTime = 100;
     if (i === 14) intervalTime = 50;
   }
@@ -205,32 +206,41 @@ async function playGameOverSequence() {
     if (i === 14) intervalTime = 200;
   }
 
-  // dekuを固定表示
+  // deku固定表示
   deku.style.opacity = 1;
+  clearInterval(followInterval); // 追従終了
 
   // ワンテンポ置いてクリック可能に
   await new Promise(r => setTimeout(r, 500));
   msgWindow.onclick = () => {
     msgWindow.style.display = "none";
-    deku.style.display = "none"; // リセット時に非表示
+    deku.style.display = "none";
+    luntu.style.opacity = 1; // ←ここでluntuを復活
     resetToOpening();
   };
 }
 
 // -----------------------------
-// ゲームオーバー／クリア後、オープニングに戻る
+// resetToOpening 修正版
 // -----------------------------
 function resetToOpening() {
   game.style.display = "none";
   opening.style.display = "flex";
 
-  curtainLeft.style.display = "block";  // ←追加
-  curtainRight.style.display = "block"; // ←追加
+  curtainLeft.style.display = "block";
+  curtainRight.style.display = "block";
   curtainLeft.className = "curtain";    
   curtainRight.className = "curtain";
 
   openingPress.style.display = "block";
   openingPress.classList.remove("press-flash");
+
+  // luntuを初期位置・表示状態に戻す
+  luntu.style.left = "150px";
+  luntu.style.top = "60px";
+  luntu.style.opacity = 1;
+
+  deku.style.display = "none"; // 念のため
 
   openingActive = true;
 }
