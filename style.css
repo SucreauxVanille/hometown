@@ -13,6 +13,19 @@ body {
   height: 250px;
 }
 
+.message {
+  position: absolute;
+  width: 400px;         /* あなたの作った画像に合わせる */
+  left: 0;
+  right: 0;
+  top: 150px;           /* 好みで調整 */
+  margin: 0 auto;
+  display: none;
+  cursor: pointer;
+  z-index: 999;
+}
+
+
 .watermelon {
   width: 60px;
   cursor: pointer;
