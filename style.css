@@ -17,6 +17,7 @@ body {
 #luntu {
   position: absolute;
   width: 150px;
+  z-index: 10;
   transition: left 0.4s, top 0.4s, transform 0.2s;
   pointer-events: none;
 }
@@ -25,6 +26,7 @@ body {
 .watermelon {
   position: absolute;
   width: 60px;
+  z-index: 100;
   cursor: pointer;
   transition: opacity 0.2s;
 }
