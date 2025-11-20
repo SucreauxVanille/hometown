@@ -61,9 +61,19 @@ function initGame() {
 // ルントウ移動：スイカの上
 // -----------------------------
 function moveLuntuTo(target) {
-  luntu.style.left = target.offsetLeft + "px";
-  luntu.style.top = (target.offsetTop - 80) + "px";
+  // x座標：スイカ中央にルントウ中央を合わせる
+  const targetCenterX = target.offsetLeft + target.offsetWidth / 2;
+  const luntuWidth = luntu.offsetWidth;
+  const luntuLeft = targetCenterX - luntuWidth / 2;
+
+  // y座標：スイカの上に、さらに30%上方向にオフセット
+  const yOffset = -0.3 * luntu.offsetHeight;  // 30%上
+  const luntuTop = target.offsetTop - luntu.offsetHeight + yOffset;
+
+  luntu.style.left = `${luntuLeft}px`;
+  luntu.style.top = `${luntuTop}px`;
 }
+
 
 // -----------------------------
 // 攻撃メッセージを表示（短時間）
