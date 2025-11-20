@@ -91,15 +91,13 @@ function showMessage(imgName, onClick = null) {
 // -----------------------------
 function resetToOpening() {
   game.style.display = "none";
-  opening.style.display = "block";
+  opening.style.display = "flex";
 
-  // カーテン初期化
-  curtainLeft.style.display = "none";
-  curtainRight.style.display = "none";
-  curtainLeft.className = "curtain";
+  curtainLeft.style.display = "block";  // ←追加
+  curtainRight.style.display = "block"; // ←追加
+  curtainLeft.className = "curtain";    
   curtainRight.className = "curtain";
 
-  // press 再表示
   openingPress.style.display = "block";
   openingPress.classList.remove("press-flash");
 
