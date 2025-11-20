@@ -14,14 +14,14 @@ body {
 }
 
 .watermelon {
-  width: 80px;
+  width: 60px;
   cursor: pointer;
   position: absolute;
   transition: opacity 0.2s;
 }
 
 #luntu {
-  width: 80px;
+  width: 100px;
   position: absolute;
   transition: left 0.4s, top 0.4s, transform 0.2s;
   pointer-events: none; /* クリックを貫通させる */
