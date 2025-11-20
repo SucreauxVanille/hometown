@@ -133,3 +133,39 @@ body {
 .press-flash {
   animation: pressFlash 0.1s linear 5;  /* 5回ほど点滅 */
 }
+/* ▼ 暗転用の黒幕（カーテン） */
+.curtain {
+  position: fixed;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  background: black;
+  z-index: 12000;
+  pointer-events: none;
+  transform: translateX(0);
+  opacity: 0;          /* 最初は透明 */
+  transition: opacity 0.4s ease, transform 1s ease;
+}
+
+/* 左右の配置 */
+#curtainLeft {
+  left: 0;
+}
+
+#curtainRight {
+  right: 0;
+}
+
+/* ▼ 暗転状態（画面が黒で覆われる） */
+.curtain-show {
+  opacity: 1;         /* 黒い幕が出現 */
+}
+
+/* ▼ 左右に開くアニメ */
+.curtain-open-left {
+  transform: translateX(-100%); /* 左幕を左へ */
+}
+
+.curtain-open-right {
+  transform: translateX(100%); /* 右幕を右へ */
+}
