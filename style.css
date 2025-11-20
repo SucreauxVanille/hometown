@@ -16,14 +16,14 @@ body {
 /* ルントウ */
 #luntu {
   position: absolute;
-  width: 100px;
+  width: 120px;
   transition: left 0.4s, top 0.4s, transform 0.2s;
 }
 
 /* スイカ */
 .watermelon {
   position: absolute;
-  width: 60px;
+  width: 50px;
   cursor: pointer;
   transition: opacity 0.2s;
 }
