@@ -166,6 +166,56 @@ async function playHitSequence() {
     gameEnabled = true;
   });
 }
+const deku = document.getElementById("deku"); // 老いたルントウ画像
+
+// ==============================
+// ゲームオーバー演出：ルントウ老化
+// ==============================
+async function playGameOverSequence() {
+  gameEnabled = false; // 操作禁止
+  msgWindow.style.display = "block";
+  msgImage.src = MSG_GAMEOVER;
+
+  // luntuとdeku重ねて点滅開始
+  deku.style.display = "block";
+  deku.style.opacity = 0;
+  let opacity = 0;
+  let step = 0.05;
+  let intervalTime = 200; // 初期点滅速度
+
+  // luntuとdekuの交互点滅
+  for (let i = 0; i < 20; i++) {
+    opacity = i % 2 === 0 ? 1 : 0;
+    luntu.style.opacity = opacity;
+    deku.style.opacity = 1 - opacity;
+    await new Promise(r => setTimeout(r, intervalTime));
+
+    // 点滅速度を徐々に上げる
+    if (i === 9) intervalTime = 100;
+    if (i === 14) intervalTime = 50;
+  }
+
+  // luntu消してdekuのみ点滅
+  luntu.style.opacity = 0;
+  intervalTime = 50;
+  for (let i = 0; i < 20; i++) {
+    deku.style.opacity = i % 2 === 0 ? 1 : 0;
+    await new Promise(r => setTimeout(r, intervalTime));
+    if (i === 9) intervalTime = 100;
+    if (i === 14) intervalTime = 200;
+  }
+
+  // dekuを固定表示
+  deku.style.opacity = 1;
+
+  // ワンテンポ置いてクリック可能に
+  await new Promise(r => setTimeout(r, 500));
+  msgWindow.onclick = () => {
+    msgWindow.style.display = "none";
+    deku.style.display = "none"; // リセット時に非表示
+    resetToOpening();
+  };
+}
 
 // -----------------------------
 // ゲームオーバー／クリア後、オープニングに戻る
@@ -220,13 +270,15 @@ watermelons.forEach((wm, index) => {
       }
       wm.style.display = "none";
 
-      if (missCount >= 2) {
-        showMessage(MSG_MISS, () => {
-          showMessage(MSG_GAMEOVER, resetToOpening);
-        });
-      } else {
-        showMessage(MSG_MISS);
-      }
+if (missCount >= 2) {
+  showMessage(MSG_MISS, () => {
+    // 従来の resetToOpening → 新演出関数に差し替え
+    playGameOverSequence();
+  });
+} else {
+  showMessage(MSG_MISS);
+}
+
     }
 
     lastClicked = null;
