@@ -1,3 +1,31 @@
+// ============================================
+// ▼ オープニング画面制御
+// ============================================
+const opening = document.getElementById("opening");
+const openingPress = document.getElementById("openingPress");
+const game = document.getElementById("game");
+
+let openingActive = true;
+
+// ▼ オープニング画面のクリックで開始準備
+opening.addEventListener("click", () => {
+  if (!openingActive) return;
+  openingActive = false;
+
+  // pressアイコンを点滅
+  openingPress.classList.add("press-flash");
+
+  // 点滅完了後にゲーム画面へ
+  setTimeout(() => {
+    opening.style.display = "none";
+    game.style.display = "block";
+
+    // ゲーム本編開始
+    initGame();
+
+  }, 600); // 点滅アニメ終了に合わせる
+});
+
 const luntu = document.getElementById("luntu");
 const watermelons = [
   document.getElementById("w0"),
