@@ -169,3 +169,16 @@ body {
 .curtain-open-right {
   transform: translateX(100%); /* 右幕を右へ */
 }
+
+#fadeBlack {
+  position: fixed;
+  inset: 0;
+  background: black;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.8s ease;
+  z-index: 9999;
+}
+.fade-active {
+  opacity: 1;
+}
