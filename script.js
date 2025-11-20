@@ -6,45 +6,63 @@ const openingPress = document.getElementById("openingPress");
 const game = document.getElementById("game");
 const curtainLeft = document.getElementById("curtainLeft");
 const curtainRight = document.getElementById("curtainRight");
+const intro = document.getElementById("intro"); // イントロ画像
 
 let openingActive = true;
 
-// ▼ オープニング画面のクリックで開始準備
-opening.addEventListener("click", () => {
+// ==============================
+// イントロ表示（フェードイン→静止→フェードアウト）
+// ==============================
+function showIntro(duration = 4000) {
+  return new Promise(resolve => {
+    intro.style.display = "block";
+    setTimeout(() => { intro.style.opacity = 1; }, 50); // フェードイン
+
+    setTimeout(() => {
+      intro.style.opacity = 0; // フェードアウト
+      setTimeout(() => {
+        intro.style.display = "none";
+        resolve();
+      }, 1000); // フェードアウト同期
+    }, duration);
+  });
+}
+
+// ==============================
+// オープニングクリック処理
+// ==============================
+opening.addEventListener("click", async () => {
   if (!openingActive) return;
   openingActive = false;
 
-  // pressアイコン点滅
+  // press点滅
   openingPress.classList.add("press-flash");
 
-  // 点滅終了後：暗転開始
+  // 点滅終了後、暗転
+  await new Promise(r => setTimeout(r, 600));
+  curtainLeft.classList.add("curtain-show");
+  curtainRight.classList.add("curtain-show");
+
+  await new Promise(r => setTimeout(r, 400)); // 暗転待機
+
+  // イントロ表示
+  await showIntro(4000);
+
+  // カーテンオープン
+  opening.style.display = "none";
+  game.style.display = "block";
+  curtainLeft.classList.add("curtain-open-left");
+  curtainRight.classList.add("curtain-open-right");
+
   setTimeout(() => {
-    curtainLeft.classList.add("curtain-show");
-    curtainRight.classList.add("curtain-show");
-  }, 600);
-
-  // 暗転が完全に行われた後、ゲーム画面へ切り替え
-  setTimeout(() => {
-    opening.style.display = "none";
-    game.style.display = "block";
-
-    // カーテンを左右に開く
-    curtainLeft.classList.add("curtain-open-left");
-    curtainRight.classList.add("curtain-open-right");
-
-    // カーテンが開き終わった後、黒幕を消す
-    setTimeout(() => {
-      curtainLeft.style.display = "none";
-      curtainRight.style.display = "none";
-    }, 1000);
-
-    // ゲーム開始
+    curtainLeft.style.display = "none";
+    curtainRight.style.display = "none";
     initGame();
   }, 1000);
 });
 
 // ============================================
-// ▼ ゲーム用オブジェクト
+// ▼ ゲーム本編制御
 // ============================================
 const luntu = document.getElementById("luntu");
 const watermelons = [
@@ -52,7 +70,6 @@ const watermelons = [
   document.getElementById("w1"),
   document.getElementById("w2")
 ];
-
 const msgWindow = document.getElementById("messageWindow");
 const msgImage = document.getElementById("messageImage");
 
@@ -66,13 +83,12 @@ const MSG_HIT3 = "hit3.png";
 const MSG_CLEAR = "clear.png";
 const MSG_GAMEOVER = "gameover.png";
 
-// ゲーム状態
-let charIndex = 0;
-let lastClicked = -1;
-let gameEnabled = false;
-let missCount = 0;
-let missedIndexes = new Set();
-let repeatCount = 0;
+let charIndex = 0;       // 当たりスイカ
+let lastClicked = -1;    // 前回クリック
+let gameEnabled = false; // ゲーム開始判定
+let missCount = 0;       // 異なるハズレ回数
+let missedIndexes = new Set(); // ハズレスイカのindex管理
+let repeatCount = 0;     // 連続クリック回数
 
 // -----------------------------
 // メッセージ表示
@@ -84,24 +100,6 @@ function showMessage(imgName, onClick = null) {
     msgWindow.style.display = "none";
     if (onClick) onClick();
   };
-}
-
-// -----------------------------
-// オープニングに戻す
-// -----------------------------
-function resetToOpening() {
-  game.style.display = "none";
-  opening.style.display = "flex";
-
-  curtainLeft.style.display = "block";  // ←追加
-  curtainRight.style.display = "block"; // ←追加
-  curtainLeft.className = "curtain";    
-  curtainRight.className = "curtain";
-
-  openingPress.style.display = "block";
-  openingPress.classList.remove("press-flash");
-
-  openingActive = true;
 }
 
 // -----------------------------
@@ -120,6 +118,7 @@ function initGame() {
   lastClicked = -1;
   missCount = 0;
   missedIndexes.clear();
+  repeatCount = 0;
   gameEnabled = false;
 
   showMessage(MSG_START, () => {
@@ -143,11 +142,11 @@ function moveLuntuTo(target) {
 // -----------------------------
 function showAttackMessage(duration = 700) {
   return new Promise(resolve => {
-    gameEnabled = false;
+    gameEnabled = false; // 表示中クリック無効化
     showMessage(MSG_ATTACK);
     setTimeout(() => {
       msgWindow.style.display = "none";
-      gameEnabled = true;
+      gameEnabled = true; // 再度有効化
       resolve();
     }, duration);
   });
@@ -163,9 +162,26 @@ async function playHitSequence() {
   showMessage(MSG_HIT2);
   await new Promise(r => setTimeout(r, 600));
   showMessage(MSG_HIT3, () => {
-    showMessage(MSG_CLEAR, resetToOpening); // ここを initGame → resetToOpening に変更
+    showMessage(MSG_CLEAR, resetToOpening);
     gameEnabled = true;
   });
+}
+
+// -----------------------------
+// ゲームオーバー／クリア後、オープニングに戻る
+// -----------------------------
+function resetToOpening() {
+  game.style.display = "none";
+  opening.style.display = "block";
+  curtainLeft.style.display = "block";
+  curtainRight.style.display = "block";
+
+  // 初期位置リセット
+  openingActive = true;
+  openingPress.classList.remove("press-flash");
+  curtainLeft.classList.remove("curtain-show", "curtain-open-left");
+  curtainRight.classList.remove("curtain-show", "curtain-open-right");
+  intro.style.display = "none";
 }
 
 // -----------------------------
@@ -175,11 +191,8 @@ watermelons.forEach((wm, index) => {
   wm.addEventListener("click", async () => {
     if (!gameEnabled) return;
 
-    if (lastClicked !== index) {
-      repeatCount = 0;
-    } else {
-      repeatCount++;
-    }
+    if (lastClicked !== index) repeatCount = 0;
+    else repeatCount++;
     if (repeatCount >= 2) return;
 
     if (lastClicked !== index) {
@@ -207,7 +220,7 @@ watermelons.forEach((wm, index) => {
 
       if (missCount >= 2) {
         showMessage(MSG_MISS, () => {
-          showMessage(MSG_GAMEOVER, resetToOpening); // ここも resetToOpening
+          showMessage(MSG_GAMEOVER, resetToOpening);
         });
       } else {
         showMessage(MSG_MISS);
