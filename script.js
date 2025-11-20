@@ -12,20 +12,23 @@ const msgImage = document.getElementById("messageImage");
 const MSG_START = "start.png";
 const MSG_ATTACK = "attack.png";
 const MSG_MISS = "miss.png";
-const MSG_HIT = "hit.png";
+const MSG_HIT1 = "hit.png";
+const MSG_HIT2 = "hit2.png";
+const MSG_HIT3 = "hit3.png";
+const MSG_CLEAR = "clear.png";
+const MSG_GAMEOVER = "gameover.png";
 
 let charIndex = 0;       // 当たりスイカ
-let lastClicked = -1;    // 前回クリックしたスイカ
+let lastClicked = -1;    // 前回クリック
 let gameEnabled = false; // ゲーム開始判定
+let missCount = 0;       // ハズレ回数
 
 // -----------------------------
-// 共通：メッセージ制御
+// メッセージ表示
 // -----------------------------
 function showMessage(imgName, onClick = null) {
   msgImage.src = imgName;
   msgWindow.style.display = "block";
-
-  // クリック時の動作を設定
   msgWindow.onclick = () => {
     msgWindow.style.display = "none";
     if (onClick) onClick();
@@ -36,47 +39,37 @@ function showMessage(imgName, onClick = null) {
 // ゲーム初期化
 // -----------------------------
 function initGame() {
-  // スイカ復活
   watermelons.forEach(w => {
     w.style.display = "block";
     w.classList.remove("flash");
   });
 
-  // ルントウ初期位置
   luntu.style.left = "150px";
   luntu.style.top = "60px";
 
-  // 当たり再抽選
   charIndex = Math.floor(Math.random() * 3);
   lastClicked = -1;
+  missCount = 0;
   gameEnabled = false;
 
-  // スタートメッセージ表示
   showMessage(MSG_START, () => {
     gameEnabled = true;
   });
 }
 
 // -----------------------------
-// ルントウ移動：スイカの上
+// ルントウ移動：スイカ中央＋y位置調整
 // -----------------------------
 function moveLuntuTo(target) {
-  // x座標：スイカ中央にルントウ中央を合わせる
   const targetCenterX = target.offsetLeft + target.offsetWidth / 2;
-  const luntuWidth = luntu.offsetWidth;
-  const luntuLeft = targetCenterX - luntuWidth / 2;
-
-  // y座標：スイカの上に、さらに30%上方向にオフセット
-  const yOffset = -0.3 * luntu.offsetHeight;  // 30%上
-  const luntuTop = target.offsetTop - luntu.offsetHeight + yOffset;
-
+  const luntuLeft = targetCenterX - luntu.offsetWidth / 2;
+  const luntuTop = target.offsetTop - luntu.offsetHeight - 0.3 * luntu.offsetHeight;
   luntu.style.left = `${luntuLeft}px`;
   luntu.style.top = `${luntuTop}px`;
 }
 
-
 // -----------------------------
-// 攻撃メッセージを表示（短時間）
+// 攻撃演出（短時間表示）
 // -----------------------------
 function showAttackMessage(duration = 700) {
   return new Promise(resolve => {
@@ -89,13 +82,27 @@ function showAttackMessage(duration = 700) {
 }
 
 // -----------------------------
+// 当たり演出（hit → hit2 → hit3 → clear）
+// -----------------------------
+async function playHitSequence() {
+  // hit → hit2 → hit3
+  showMessage(MSG_HIT1);
+  await new Promise(r => setTimeout(r, 300));
+  showMessage(MSG_HIT2);
+  await new Promise(r => setTimeout(r, 300));
+
+  showMessage(MSG_HIT3, () => {
+    showMessage(MSG_CLEAR, initGame);
+  });
+}
+
+// -----------------------------
 // メイン：スイカクリック処理
 // -----------------------------
 watermelons.forEach((wm, index) => {
   wm.addEventListener("click", async () => {
     if (!gameEnabled) return;
 
-    // 1回目タップ：移動のみ
     if (lastClicked !== index) {
       lastClicked = index;
       moveLuntuTo(wm);
@@ -107,25 +114,24 @@ watermelons.forEach((wm, index) => {
 
     luntu.classList.add("jump");
     wm.classList.add("flash");
-
-    // ジャンプ時間
     await new Promise(r => setTimeout(r, 300));
-
     luntu.classList.remove("jump");
     wm.classList.remove("flash");
 
-    // 判定
     if (index === charIndex) {
       // 当たり
-      showMessage(MSG_HIT, initGame);
+      playHitSequence();
     } else {
       // ハズレ
       wm.style.display = "none";
+      missCount++;
 
-      // missを表示→クリックで消えるだけ
-      showMessage(MSG_MISS, () => {
-        // ゲーム続行可能
-      });
+      if (missCount >= 2) {
+        // ゲームオーバー
+        showMessage(MSG_GAMEOVER, initGame);
+      } else {
+        showMessage(MSG_MISS);
+      }
     }
 
     lastClicked = null;
@@ -133,6 +139,6 @@ watermelons.forEach((wm, index) => {
 });
 
 // -----------------------------
-// ページ読み込みで初期化
+// ページロードで初期化
 // -----------------------------
 initGame();
