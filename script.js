@@ -4,6 +4,8 @@
 const opening = document.getElementById("opening");
 const openingPress = document.getElementById("openingPress");
 const game = document.getElementById("game");
+const curtainLeft = document.getElementById("curtainLeft");
+const curtainRight = document.getElementById("curtainRight");
 
 let openingActive = true;
 
@@ -12,18 +14,35 @@ opening.addEventListener("click", () => {
   if (!openingActive) return;
   openingActive = false;
 
-  // pressアイコンを点滅
+  // pressアイコン点滅
   openingPress.classList.add("press-flash");
 
-  // 点滅完了後にゲーム画面へ
+  // 点滅終了後：暗転開始
+  setTimeout(() => {
+    curtainLeft.classList.add("curtain-show");
+    curtainRight.classList.add("curtain-show");
+  }, 600); // press点滅時間
+
+
+  // 暗転が完全に行われた後、ゲーム画面へ切り替え
   setTimeout(() => {
     opening.style.display = "none";
     game.style.display = "block";
 
-    // ゲーム本編開始
+    // カーテンを左右に開く
+    curtainLeft.classList.add("curtain-open-left");
+    curtainRight.classList.add("curtain-open-right");
+
+    // カーテンが開き終わった後、黒幕を消す
+    setTimeout(() => {
+      curtainLeft.style.display = "none";
+      curtainRight.style.display = "none";
+    }, 1000);
+
+    // ゲーム開始
     initGame();
 
-  }, 600); // 点滅アニメ終了に合わせる
+  }, 1000); // 暗転してからカーテン演出へ
 });
 
 const luntu = document.getElementById("luntu");
