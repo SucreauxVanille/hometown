@@ -23,7 +23,7 @@ body {
 /* スイカ */
 .watermelon {
   position: absolute;
-  width: 50px;
+  width: 60px;
   cursor: pointer;
   transition: opacity 0.2s;
 }
