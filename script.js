@@ -1,44 +1,47 @@
 // ============================================
-// ▼ オープニング画面制御
+// ▼ オープニング画面制御（イントロ付き）
 // ============================================
 const opening = document.getElementById("opening");
 const openingPress = document.getElementById("openingPress");
 const game = document.getElementById("game");
 const curtainLeft = document.getElementById("curtainLeft");
 const curtainRight = document.getElementById("curtainRight");
+const msgWindow = document.getElementById("messageWindow");
+const msgImage = document.getElementById("messageImage");
 
 let openingActive = true;
 
+// ▼ press 点滅 + 暗転 + イントロ表示
 opening.addEventListener("click", () => {
   if (!openingActive) return;
   openingActive = false;
 
-  // press点滅
+  // pressアイコン点滅
   openingPress.classList.add("press-flash");
 
-  // 暗転開始
+  // 点滅終了後：暗転開始
   setTimeout(() => {
     curtainLeft.classList.add("curtain-show");
     curtainRight.classList.add("curtain-show");
-  }, 600);
 
-  // ゲームへ切り替え
-  setTimeout(() => {
-    opening.style.display = "none";
-    game.style.display = "block";
-
-    // カーテン開く
-    curtainLeft.classList.add("curtain-open-left");
-    curtainRight.classList.add("curtain-open-right");
-
-    // カーテン消去
+    // 暗転完了したらイントロ表示
     setTimeout(() => {
-      curtainLeft.style.display = "none";
-      curtainRight.style.display = "none";
-    }, 1000);
+      showMessage("intro.png", () => {
+        // イントロ閉じたらカーテン開放
+        curtainLeft.classList.add("curtain-open-left");
+        curtainRight.classList.add("curtain-open-right");
 
-    initGame();
-  }, 1000);
+        // カーテン開放後に非表示
+        setTimeout(() => {
+          curtainLeft.style.display = "none";
+          curtainRight.style.display = "none";
+
+          // ゲーム開始
+          initGame();
+        }, 1000);
+      });
+    }, 500); // 暗転完了の待機時間
+  }, 600); // press 点滅時間
 });
 
 // ============================================
