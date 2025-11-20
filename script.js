@@ -91,13 +91,17 @@ function showMessage(imgName, onClick = null) {
 // ------------------------------------
 function returnToOpening() {
   gameEnabled = false;
-
   fadeBlack.classList.add("fade-active");
 
   setTimeout(() => {
-    window.location.href = "opening.html";
+    // フェードアウト完了 → オープニング表示
+    fadeBlack.classList.remove("fade-active");
+    game.style.display = "none";
+    opening.style.display = "block";
+    openingActive = true;
   }, 900);
 }
+
 
 // ------------------------------------
 // ゲーム初期化
