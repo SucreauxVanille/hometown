@@ -199,7 +199,8 @@ body {
 #deku {
   position: absolute;
   left: 140px; /* 初期位置 luntu と同じ */
-  top: 50px;
+  top: 50px;  
+  width: 150px;
   display: none;
   transition: opacity 0.1s linear;
   z-index: 100; /* luntu より前面に */
