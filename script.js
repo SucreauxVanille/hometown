@@ -23,7 +23,6 @@ let lastClicked = -1;    // 前回クリック
 let gameEnabled = false; // ゲーム開始判定
 let missCount = 0;       // 異なるハズレ回数
 let missedIndexes = new Set(); // ハズレスイカのindex管理
-let pendingGameOver = false;   // missクリック後に gameover に移行するフラグ
 
 // -----------------------------
 // メッセージ表示
@@ -53,7 +52,6 @@ function initGame() {
   lastClicked = -1;
   missCount = 0;
   missedIndexes.clear();
-  pendingGameOver = false;
   gameEnabled = false;
 
   showMessage(MSG_START, () => {
@@ -77,9 +75,11 @@ function moveLuntuTo(target) {
 // -----------------------------
 function showAttackMessage(duration = 700) {
   return new Promise(resolve => {
+    gameEnabled = false; // 表示中クリック無効化
     showMessage(MSG_ATTACK);
     setTimeout(() => {
       msgWindow.style.display = "none";
+      gameEnabled = true; // 再度有効化
       resolve();
     }, duration);
   });
@@ -89,12 +89,14 @@ function showAttackMessage(duration = 700) {
 // 当たり演出（hit → hit2 → hit3 → clear）
 // -----------------------------
 async function playHitSequence() {
+  gameEnabled = false; // 表示中クリック無効化
   showMessage(MSG_HIT1);
   await new Promise(r => setTimeout(r, 600));
   showMessage(MSG_HIT2);
   await new Promise(r => setTimeout(r, 600));
   showMessage(MSG_HIT3, () => {
     showMessage(MSG_CLEAR, initGame);
+    gameEnabled = true; // clearクリック後は有効化
   });
 }
 
@@ -121,6 +123,7 @@ watermelons.forEach((wm, index) => {
     luntu.classList.remove("jump");
     wm.classList.remove("flash");
 
+    // 判定
     if (index === charIndex) {
       // 当たり
       playHitSequence();
@@ -132,17 +135,14 @@ watermelons.forEach((wm, index) => {
       }
       wm.style.display = "none";
 
-      if (pendingGameOver) {
-        // 前回のmissクリック後 → gameover表示
-        showMessage(MSG_GAMEOVER, initGame);
-        pendingGameOver = false;
-      } else if (missCount >= 2) {
-        // 2回目の異なるハズレ → 次のクリックで gameover
+      if (missCount >= 2) {
+        // 2回目の異なるハズレ → まず MSG_MISS 表示
         showMessage(MSG_MISS, () => {
-          pendingGameOver = true;
+          // クリックで gameover
+          showMessage(MSG_GAMEOVER, initGame);
         });
       } else {
-        // ハズレ1回目 → メッセージ表示のみ
+        // ハズレ1回目 → MSG_MISS 表示のみ
         showMessage(MSG_MISS);
       }
     }
@@ -155,3 +155,4 @@ watermelons.forEach((wm, index) => {
 // ページロードで初期化
 // -----------------------------
 initGame();
+
