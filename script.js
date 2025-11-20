@@ -5,8 +5,8 @@ const watermelons = [
   document.getElementById("w2")
 ];
 
-const message = document.getElementById("message");
-
+const msgWindow = document.getElementById("messageWindow");
+const msgImage = document.getElementById("messageImage");
 
 let charIndex = Math.floor(Math.random() * 3); // 当たりスイカ
 let lastClicked = -1;
