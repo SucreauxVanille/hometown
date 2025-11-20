@@ -21,7 +21,9 @@ const MSG_GAMEOVER = "gameover.png";
 let charIndex = 0;       // 当たりスイカ
 let lastClicked = -1;    // 前回クリック
 let gameEnabled = false; // ゲーム開始判定
-let missCount = 0;       // ハズレ回数
+let missCount = 0;       // 異なるハズレ回数
+let missedIndexes = new Set(); // ハズレスイカのindex管理
+let pendingGameOver = false;   // missクリック後に gameover に移行するフラグ
 
 // -----------------------------
 // メッセージ表示
@@ -50,6 +52,8 @@ function initGame() {
   charIndex = Math.floor(Math.random() * 3);
   lastClicked = -1;
   missCount = 0;
+  missedIndexes.clear();
+  pendingGameOver = false;
   gameEnabled = false;
 
   showMessage(MSG_START, () => {
@@ -85,12 +89,10 @@ function showAttackMessage(duration = 700) {
 // 当たり演出（hit → hit2 → hit3 → clear）
 // -----------------------------
 async function playHitSequence() {
-  // hit → hit2 → hit3
   showMessage(MSG_HIT1);
-  await new Promise(r => setTimeout(r, 300));
+  await new Promise(r => setTimeout(r, 600));
   showMessage(MSG_HIT2);
-  await new Promise(r => setTimeout(r, 300));
-
+  await new Promise(r => setTimeout(r, 600));
   showMessage(MSG_HIT3, () => {
     showMessage(MSG_CLEAR, initGame);
   });
@@ -103,6 +105,7 @@ watermelons.forEach((wm, index) => {
   wm.addEventListener("click", async () => {
     if (!gameEnabled) return;
 
+    // 1回目タップ：移動のみ
     if (lastClicked !== index) {
       lastClicked = index;
       moveLuntuTo(wm);
@@ -123,13 +126,23 @@ watermelons.forEach((wm, index) => {
       playHitSequence();
     } else {
       // ハズレ
+      if (!missedIndexes.has(index)) {
+        missedIndexes.add(index);
+        missCount++;
+      }
       wm.style.display = "none";
-      missCount++;
 
-      if (missCount >= 2) {
-        // ゲームオーバー
+      if (pendingGameOver) {
+        // 前回のmissクリック後 → gameover表示
         showMessage(MSG_GAMEOVER, initGame);
+        pendingGameOver = false;
+      } else if (missCount >= 2) {
+        // 2回目の異なるハズレ → 次のクリックで gameover
+        showMessage(MSG_MISS, () => {
+          pendingGameOver = true;
+        });
       } else {
+        // ハズレ1回目 → メッセージ表示のみ
         showMessage(MSG_MISS);
       }
     }
