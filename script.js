@@ -23,6 +23,7 @@ let lastClicked = -1;    // 前回クリック
 let gameEnabled = false; // ゲーム開始判定
 let missCount = 0;       // 異なるハズレ回数
 let missedIndexes = new Set(); // ハズレスイカのindex管理
+let repeatCount = 0; // 連続クリック回数
 
 // -----------------------------
 // メッセージ表示
@@ -106,6 +107,19 @@ async function playHitSequence() {
 watermelons.forEach((wm, index) => {
   wm.addEventListener("click", async () => {
     if (!gameEnabled) return;
+    // ▼▼▼ 連続クリック制御 ▼▼▼
+
+    // 異なるスイカなら連続回数リセット
+    if (lastClicked !== index) {
+      repeatCount = 0;
+    } else {
+      repeatCount++;
+    }
+
+    // 同じスイカ3連続以上は禁止
+    if (repeatCount >= 2) {
+      return; // 完全無効（動作しない）
+    }
 
     // 1回目タップ：移動のみ
     if (lastClicked !== index) {
