@@ -196,3 +196,11 @@ body {
 .fade-active {
   opacity: 1;
 }
+#deku {
+  position: absolute;
+  left: 150px; /* 初期位置 luntu と同じ */
+  top: 60px;
+  display: none;
+  transition: opacity 0.1s linear;
+  z-index: 100; /* luntu より前面に */
+}
