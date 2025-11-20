@@ -70,3 +70,66 @@ body {
   height: auto;      /* 縦横比維持 */
   display: block;
 }
+/* ▼ Opening Screen 全体 */
+#opening {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #c98d45;   /* 落ち着いた夕暮れオレンジ */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  overflow: hidden;
+  z-index: 9999;
+}
+
+/* ▼ ルントウ（背景用・大きく拡大） */
+#openingLuntu {
+  position: absolute;
+  width: 450px;         /* 思い切って拡大してチープ感 */
+  opacity: 0.3;         /* うっすら背景に */
+  bottom: -20px;        /* 少し下へ沈める */
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+/* ▼ タイトル画像（上から25%の位置） */
+#openingTitle {
+  position: absolute;
+  top: 25%;
+  width: 300px;     /* 元150 → 2倍拡大 */
+  transform: translateY(-50%);
+  image-rendering: pixelated; /* チープな拡大表現 */
+}
+
+/* ▼ Press ボタン（中央） */
+#openingPress {
+  position: absolute;
+  top: 55%;
+  transform: translateY(-50%);
+  width: 180px;
+  cursor: pointer;
+}
+
+/* ▼ コピーライト（画面下部） */
+#openingCopy {
+  position: absolute;
+  bottom: 20px;
+  width: 200px;
+  opacity: 0.8;
+}
+
+/* ▼ press.png 点滅アニメーション */
+@keyframes pressFlash {
+  0%   { filter: invert(0); }
+  50%  { filter: invert(1); }
+  100% { filter: invert(0); }
+}
+
+.press-flash {
+  animation: pressFlash 0.1s linear 5;  /* 5回ほど点滅 */
+}
