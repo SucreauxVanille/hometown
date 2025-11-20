@@ -170,6 +170,20 @@ body {
   transform: translateX(100%); /* 右幕を右へ */
 }
 
+/* イントロ表示 */
+#intro {
+  position: absolute;
+  top: 20%;      /* 適宜調整 */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;    /* 適宜調整 */
+  max-width: 400px;
+  opacity: 0;
+  transition: opacity 1s ease-in-out; /* フェードイン/アウト */
+  z-index: 500;  /* メッセージウインドウより下 */
+  display: none;
+}
+
 #fadeBlack {
   position: fixed;
   inset: 0;
