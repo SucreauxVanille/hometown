@@ -43,8 +43,8 @@ function initGame() {
   });
 
   // ルントウ初期位置
-  luntu.style.left = "160px";
-  luntu.style.top = "70px";
+  luntu.style.left = "150px";
+  luntu.style.top = "60px";
 
   // 当たり再抽選
   charIndex = Math.floor(Math.random() * 3);
