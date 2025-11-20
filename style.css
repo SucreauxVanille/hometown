@@ -10,34 +10,29 @@ body {
 #game {
   position: relative;
   width: 400px;
-  height: 250px;
+  margin: auto;
 }
 
-.message {
+.luntu {
   position: absolute;
-  width: 400px;         /* あなたの作った画像に合わせる */
-  left: 0;
-  right: 0;
-  top: 150px;           /* 好みで調整 */
-  margin: 0 auto;
-  display: none;
-  cursor: pointer;
-  z-index: 999;
+  width: 80px;
+  z-index: 5;
 }
-
 
 .watermelon {
-  width: 60px;
-  cursor: pointer;
   position: absolute;
-  transition: opacity 0.2s;
+  width: 120px;
+  z-index: 3;
 }
 
-#luntu {
-  width: 100px;
+/* 画面下部のメッセージウインドウ固定 */
+.message {
   position: absolute;
-  transition: left 0.4s, top 0.4s, transform 0.2s;
-  pointer-events: none; /* クリックを貫通させる */
+  bottom: 0px;
+  left: 0;
+  width: 400px;
+  display: none;
+  z-index: 10;
 }
 
 /* ▼ スイカ点滅アニメーション */
