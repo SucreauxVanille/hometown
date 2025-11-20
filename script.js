@@ -172,17 +172,19 @@ async function playHitSequence() {
 // -----------------------------
 function resetToOpening() {
   game.style.display = "none";
-  opening.style.display = "block";
-  curtainLeft.style.display = "block";
-  curtainRight.style.display = "block";
+  opening.style.display = "flex";
 
-  // 初期位置リセット
-  openingActive = true;
+  curtainLeft.style.display = "block";  // ←追加
+  curtainRight.style.display = "block"; // ←追加
+  curtainLeft.className = "curtain";    
+  curtainRight.className = "curtain";
+
+  openingPress.style.display = "block";
   openingPress.classList.remove("press-flash");
-  curtainLeft.classList.remove("curtain-show", "curtain-open-left");
-  curtainRight.classList.remove("curtain-show", "curtain-open-right");
-  intro.style.display = "none";
+
+  openingActive = true;
 }
+
 
 // -----------------------------
 // メイン：スイカクリック処理
