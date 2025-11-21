@@ -335,8 +335,8 @@ async function playClearDance() {
   gameEnabled = false;
 
   // 中央に移動
-  luntu.style.left = "200px";
-  luntu.style.top = "60px";
+  luntu.style.left = "150px";
+  luntu.style.top = "50px";
 
   // ジャンプ＋回転の1セット
   for (let i = 0; i < 2; i++) {
