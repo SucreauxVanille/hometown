@@ -333,7 +333,7 @@ if (missCount >= 2) {
   });
 });
 // -----------------------------
-// 勝利の舞
+// 勝利の舞（改良版）
 // -----------------------------
 async function playClearDance() {
   gameEnabled = false;
@@ -342,20 +342,21 @@ async function playClearDance() {
   luntu.style.left = "150px";
   luntu.style.top = "50px";
 
-  // ジャンプ＋回転の1セット
-  for (let i = 0; i < 2; i++) {
-    for (let j = 0; j < 2; j++) {
+  // ジャンプ×2 → 回転 ×1 を2セット
+  for (let set = 0; set < 2; set++) {
+    for (let jump = 0; jump < 2; jump++) {
       // ジャンプ
       luntu.classList.add("jump");
       await new Promise(r => setTimeout(r, 400));
       luntu.classList.remove("jump");
-
-      // 回転（scaleXでターン）
-      luntu.style.transform = "scaleX(-1)";
-      await new Promise(r => setTimeout(r, 400));
-      luntu.style.transform = "scaleX(1)";
-      await new Promise(r => setTimeout(r, 400));
+      await new Promise(r => setTimeout(r, 100)); // ジャンプ間の小間
     }
+
+    // 回転
+    luntu.style.transform = "scaleX(-1)";
+    await new Promise(r => setTimeout(r, 400));
+    luntu.style.transform = "scaleX(1)";
+    await new Promise(r => setTimeout(r, 100)); // 回転後の小間
   }
 
   // 最後のジャンプ
@@ -366,7 +367,6 @@ async function playClearDance() {
   // ワンテンポ置いて操作可能
   gameEnabled = true;
 }
-
 
 // -----------------------------
 // ページロードで初期化
