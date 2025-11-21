@@ -159,18 +159,25 @@ async function playHitSequence() {
   gameEnabled = false;
   showMessage(MSG_HIT1);
   await new Promise(r => setTimeout(r, 600));
+
   showMessage(MSG_HIT2);
   await new Promise(r => setTimeout(r, 600));
-  showMessage(MSG_HIT3, () => {
+
+  showMessage(MSG_HIT3, async () => {
+    // 🔽 ここでダンスを実行
+    await playClearDance();
+
+    // 🔽 ダンス終了後にクリアメッセージへ
     showMessage(MSG_CLEAR, resetToOpening);
     gameEnabled = true;
   });
 }
-const deku = document.getElementById("deku"); // 老いたルントウ画像
+
 
 // ==============================
 // ゲームオーバー演出：ルントウ老化（安定追従版）
 // ==============================
+const deku = document.getElementById("deku"); // 老いたルントウ画像
 async function playGameOverSequence() {
   gameEnabled = false; // 操作禁止
 
@@ -321,6 +328,25 @@ if (missCount >= 2) {
     lastClicked = null;
   });
 });
+// -----------------------------
+// 勝利の舞
+// -----------------------------
+function playClearDance() {
+  return new Promise(resolve => {
+    // アニメを一度削除してから付け直す（連続発動に備える）
+    luntu.classList.remove("luntu-dance");
+    // 再付与は少し遅らせる
+    requestAnimationFrame(() => {
+      luntu.classList.add("luntu-dance");
+
+      // アニメ時間に合わせて終了後 resolve
+      setTimeout(() => {
+        luntu.classList.remove("luntu-dance");
+        resolve();
+      }, 700);
+    });
+  });
+}
 
 // -----------------------------
 // ページロードで初期化
