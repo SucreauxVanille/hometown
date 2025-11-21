@@ -205,3 +205,18 @@ body {
   transition: opacity 0.1s linear;
   z-index: 100; /* luntu より前面に */
 }
+/* ==========================
+   Luntu ターンダンス
+   ========================== */
+@keyframes luntuTurnDance {
+  0%   { transform: scaleX(1); }
+  25%  { transform: scaleX(0); }
+  50%  { transform: scaleX(-1); }
+  75%  { transform: scaleX(0); }
+  100% { transform: scaleX(1); }
+}
+
+.luntu-dance {
+  animation: luntuTurnDance 0.7s ease-in-out forwards;
+}
+
