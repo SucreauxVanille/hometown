@@ -169,53 +169,80 @@ async function playHitSequence() {
 const deku = document.getElementById("deku"); // 老いたルントウ画像
 
 // ==============================
-// ゲームオーバー演出：ルントウ老化（luntu追従版）
+// ゲームオーバー演出：ルントウ老化（安定追従版）
 // ==============================
 async function playGameOverSequence() {
   gameEnabled = false; // 操作禁止
+
+  // ---- メッセージウインドウ（Game Over） ----
   msgWindow.style.display = "block";
   msgImage.src = MSG_GAMEOVER;
 
-  deku.style.display = "block";
+  // ---- deku 初期化 ----
+  deku.style.position = "absolute"; // 念のため再保証
   deku.style.opacity = 0;
-  
-  // luntuの位置にdekuを追従させる
+  deku.style.display = "block";
+  deku.style.visibility = "hidden"; // 位置合わせの間見えないようにする
+
+  // ---- まず luntu の位置を参考にして deku の初期位置セット ----
+  const startLeft = luntu.offsetLeft;
+  const startTop = luntu.offsetTop;
+
+  deku.style.left = startLeft + "px";
+  deku.style.top = startTop + "px";
+
+  // 位置をセットしてから表示
+  deku.style.visibility = "visible";
+
+  // ---- luntu に追従させる ----
   const followInterval = setInterval(() => {
     deku.style.left = luntu.offsetLeft + "px";
     deku.style.top = luntu.offsetTop + "px";
-  }, 50);
+  }, 40);
 
+  // ---- 交互点滅 ----
   let intervalTime = 200;
 
-  // luntuとdekuの交互点滅
   for (let i = 0; i < 20; i++) {
     luntu.style.opacity = i % 2 === 0 ? 1 : 0;
     deku.style.opacity = 1 - luntu.style.opacity;
     await new Promise(r => setTimeout(r, intervalTime));
-    if (i === 9) intervalTime = 100;
-    if (i === 14) intervalTime = 50;
+
+    if (i === 9) intervalTime = 120;
+    if (i === 14) intervalTime = 60;
   }
 
-  // luntu消してdekuのみ点滅
+  // ---- luntu 消滅、deku のみ点滅 ----
   luntu.style.opacity = 0;
-  intervalTime = 50;
+  intervalTime = 60;
+
   for (let i = 0; i < 20; i++) {
     deku.style.opacity = i % 2 === 0 ? 1 : 0;
     await new Promise(r => setTimeout(r, intervalTime));
-    if (i === 9) intervalTime = 100;
+
+    if (i === 9) intervalTime = 120;
     if (i === 14) intervalTime = 200;
   }
 
-  // deku固定表示
+  // ---- deku 固定表示 ----
   deku.style.opacity = 1;
-  clearInterval(followInterval); // 追従終了
 
-  // ワンテンポ置いてクリック可能に
+  clearInterval(followInterval);
+
+  // ---- ワンテンポ置いてリセットへ ----
   await new Promise(r => setTimeout(r, 500));
+
   msgWindow.onclick = () => {
     msgWindow.style.display = "none";
+
+    // deku を消す
     deku.style.display = "none";
-    luntu.style.opacity = 1; // ←ここでluntuを復活
+    deku.style.opacity = 0;
+
+    // luntu を復帰
+    luntu.style.opacity = 1;
+    luntu.style.display = "block";
+
     resetToOpening();
   };
 }
