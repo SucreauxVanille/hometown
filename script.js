@@ -175,9 +175,10 @@ async function playHitSequence() {
 
 
 // ==============================
-// ゲームオーバー演出：ルントウ老化（安定追従版）
+// ゲームオーバー演出：ルントウ老化（安定追従＋徐々に出現版）
 // ==============================
 const deku = document.getElementById("deku"); // 老いたルントウ画像
+
 async function playGameOverSequence() {
   gameEnabled = false; // 操作禁止
 
@@ -189,16 +190,13 @@ async function playGameOverSequence() {
   deku.style.position = "absolute"; // 念のため再保証
   deku.style.opacity = 0;
   deku.style.display = "block";
-  deku.style.visibility = "hidden"; // 位置合わせの間見えないようにする
+  deku.style.visibility = "hidden"; // 位置合わせの間は非表示
 
-  // ---- まず luntu の位置を参考にして deku の初期位置セット ----
+  // ---- luntu の位置に deku を配置 ----
   const startLeft = luntu.offsetLeft;
   const startTop = luntu.offsetTop;
-
   deku.style.left = startLeft + "px";
   deku.style.top = startTop + "px";
-
-  // 位置をセットしてから表示
   deku.style.visibility = "visible";
 
   // ---- luntu に追従させる ----
@@ -207,22 +205,28 @@ async function playGameOverSequence() {
     deku.style.top = luntu.offsetTop + "px";
   }, 40);
 
-  // ---- 交互点滅 ----
+  // ---- 最初の2秒：luntuのみ点滅 ----
   let intervalTime = 200;
+  for (let i = 0; i < 10; i++) { // 10回 × 200ms = 2秒
+    luntu.style.opacity = i % 2 === 0 ? 1 : 0;
+    deku.style.opacity = 0; // dekuは非表示
+    await new Promise(r => setTimeout(r, intervalTime));
+  }
 
+  // ---- 交互点滅開始（徐々にdekuも出現） ----
+  intervalTime = 200;
   for (let i = 0; i < 20; i++) {
     luntu.style.opacity = i % 2 === 0 ? 1 : 0;
-    deku.style.opacity = 1 - luntu.style.opacity;
+    deku.style.opacity = i % 2 === 0 ? 0 : 1; // luntuと交互
     await new Promise(r => setTimeout(r, intervalTime));
 
     if (i === 9) intervalTime = 120;
     if (i === 14) intervalTime = 60;
   }
 
-  // ---- luntu 消滅、deku のみ点滅 ----
+  // ---- luntu消滅、dekuのみ点滅 ----
   luntu.style.opacity = 0;
   intervalTime = 60;
-
   for (let i = 0; i < 20; i++) {
     deku.style.opacity = i % 2 === 0 ? 1 : 0;
     await new Promise(r => setTimeout(r, intervalTime));
@@ -234,11 +238,10 @@ async function playGameOverSequence() {
   // ---- deku 固定表示 ----
   deku.style.opacity = 1;
 
-  clearInterval(followInterval);
+  clearInterval(followInterval); // 追従終了
 
-  // ---- ワンテンポ置いてリセットへ ----
+  // ---- ワンテンポ置いてクリック可能に ----
   await new Promise(r => setTimeout(r, 500));
-
   msgWindow.onclick = () => {
     msgWindow.style.display = "none";
 
@@ -253,6 +256,7 @@ async function playGameOverSequence() {
     resetToOpening();
   };
 }
+
 
 // -----------------------------
 // resetToOpening 修正版
