@@ -349,14 +349,15 @@ async function playClearDance() {
       luntu.classList.add("jump");
       await new Promise(r => setTimeout(r, 400));
       luntu.classList.remove("jump");
-      await new Promise(r => setTimeout(r, 100)); // ジャンプ間の小間
+      await new Promise(r => setTimeout(r, 50)); // ジャンプ間の小間
     }
 
     // 回転
+    await new Promise(r => setTimeout(r, 50)); // 回転前の小間
     luntu.style.transform = "scaleX(-1)";
     await new Promise(r => setTimeout(r, 400));
     luntu.style.transform = "scaleX(1)";
-    await new Promise(r => setTimeout(r, 100)); // 回転後の小間
+    await new Promise(r => setTimeout(r, 300)); // 回転後の小間
   }
 
   // 最後のジャンプ
