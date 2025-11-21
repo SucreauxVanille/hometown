@@ -217,6 +217,6 @@ body {
 }
 
 .luntu-dance {
-  animation: luntuTurnDance 0.7s ease-in-out forwards;
+  animation: luntuTurnDance 0.5s ease-in-out forwards;
 }
 
