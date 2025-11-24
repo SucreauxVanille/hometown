@@ -111,8 +111,8 @@ function initGame() {
     w.classList.remove("flash");
   });
 
-  luntu.style.left = "130px";
-  luntu.style.top = "60px";
+  luntu.style.left = "120px";
+  luntu.style.top = "40px";
 
   charIndex = Math.floor(Math.random() * 3);
   lastClicked = -1;
