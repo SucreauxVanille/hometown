@@ -111,7 +111,7 @@ function initGame() {
     w.classList.remove("flash");
   });
 
-  luntu.style.left = "150px";
+  luntu.style.left = "130px";
   luntu.style.top = "60px";
 
   charIndex = Math.floor(Math.random() * 3);
@@ -132,7 +132,7 @@ function initGame() {
 function moveLuntuTo(target) {
   const targetCenterX = target.offsetLeft + target.offsetWidth / 2;
   const luntuLeft = targetCenterX - luntu.offsetWidth / 2;
-  const luntuTop = target.offsetTop - luntu.offsetHeight - 0.3 * luntu.offsetHeight;
+  const luntuTop = target.offsetTop - luntu.offsetHeight - 0.2 * luntu.offsetHeight;
   luntu.style.left = `${luntuLeft}px`;
   luntu.style.top = `${luntuTop}px`;
 }
