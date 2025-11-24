@@ -7,6 +7,7 @@ const game = document.getElementById("game");
 const curtainLeft = document.getElementById("curtainLeft");
 const curtainRight = document.getElementById("curtainRight");
 const intro = document.getElementById("intro"); // イントロ画像
+document.getElementById("backgroundLayer").classList.add("hidden");
 
 let openingActive = true;
 
@@ -47,6 +48,8 @@ opening.addEventListener("click", async () => {
 
   // イントロ表示
   await showIntro(4000);
+
+  document.getElementById("backgroundLayer").classList.remove("hidden");
 
   // カーテンオープン
   opening.style.display = "none";
