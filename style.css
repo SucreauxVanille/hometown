@@ -1,3 +1,6 @@
+/* ==========================
+   基本レイアウト
+   ========================== */
 body {
   display: flex;
   justify-content: center;
@@ -11,12 +14,14 @@ body {
   position: relative;
   width: 400px;
   height: 300px;
-  overflow: visible;
+  overflow: visible; /* キャラのはみ出しを許可 */
   margin: auto;
-  z-index: 10;     /* 背景より前面 */
+  z-index: 10;       /* 背景より前面 */
 }
 
-/* ルントウ */
+/* ==========================
+   キャラクター＆オブジェクト
+   ========================== */
 #luntu {
   position: absolute;
   width: 150px;
@@ -25,7 +30,6 @@ body {
   pointer-events: none;
 }
 
-/* スイカ */
 .watermelon {
   position: absolute;
   width: 60px;
@@ -61,26 +65,29 @@ body {
   position: absolute;
   bottom: 0px;
   left: 0;
-  width: 400px;       /* PC用固定幅 */
-  max-width: 100%;    /* 画面幅より大きくならない */
+  width: 400px;
+  max-width: 100%;
   display: none;
   cursor: pointer;
-  z-index: 999;       /* 最前面 */
+  z-index: 999;
 }
 
 .message-window img {
-  width: 100%;       /* 親要素幅に合わせる */
-  height: auto;      /* 縦横比維持 */
+  width: 100%;
+  height: auto;
   display: block;
 }
-/* ▼ Opening Screen 全体 */
+
+/* ==========================
+   Opening Screen
+   ========================== */
 #opening {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: #c98d45;   /* 落ち着いた夕暮れオレンジ */
+  background: #c98d45;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -89,27 +96,24 @@ body {
   z-index: 5000;
 }
 
-/* ▼ ルントウ（背景用・大きく拡大） */
 #openingLuntu {
   position: absolute;
-  width: 450px;         /* 思い切って拡大してチープ感 */
-  opacity: 0.3;         /* うっすら背景に */
-  bottom: -20px;        /* 少し下へ沈める */
+  width: 450px;
+  opacity: 0.3;
+  bottom: -20px;
   left: 50%;
   transform: translateX(-50%);
   pointer-events: none;
 }
 
-/* ▼ タイトル画像（上から25%の位置） */
 #openingTitle {
   position: absolute;
   top: 25%;
-  width: 300px;     /* 元150 → 2倍拡大 */
+  width: 300px;
   transform: translateY(-50%);
-  image-rendering: pixelated; /* チープな拡大表現 */
+  image-rendering: pixelated;
 }
 
-/* ▼ Press ボタン（中央） */
 #openingPress {
   position: absolute;
   top: 55%;
@@ -118,7 +122,6 @@ body {
   cursor: pointer;
 }
 
-/* ▼ コピーライト（画面下部） */
 #openingCopy {
   position: absolute;
   bottom: 20px;
@@ -126,7 +129,6 @@ body {
   opacity: 0.8;
 }
 
-/* ▼ press.png 点滅アニメーション */
 @keyframes pressFlash {
   0%   { filter: invert(0); }
   50%  { filter: invert(1); }
@@ -134,9 +136,12 @@ body {
 }
 
 .press-flash {
-  animation: pressFlash 0.1s linear 5;  /* 5回ほど点滅 */
+  animation: pressFlash 0.1s linear 5;
 }
-/* ▼ 暗転用の黒幕（カーテン） */
+
+/* ==========================
+   暗転用の黒幕（カーテン）
+   ========================== */
 .curtain {
   position: fixed;
   top: 0;
@@ -146,44 +151,30 @@ body {
   z-index: 6000;
   pointer-events: none;
   transform: translateX(0);
-  opacity: 0;          /* 最初は透明 */
+  opacity: 0;
   transition: opacity 0.4s ease, transform 1s ease;
 }
 
-/* 左右の配置 */
-#curtainLeft {
-  left: 0;
-}
+#curtainLeft { left: 0; }
+#curtainRight { right: 0; }
 
-#curtainRight {
-  right: 0;
-}
+.curtain-show { opacity: 1; }
+.curtain-open-left { transform: translateX(-100%); }
+.curtain-open-right { transform: translateX(100%); }
 
-/* ▼ 暗転状態（画面が黒で覆われる） */
-.curtain-show {
-  opacity: 1;         /* 黒い幕が出現 */
-}
-
-/* ▼ 左右に開くアニメ */
-.curtain-open-left {
-  transform: translateX(-100%); /* 左幕を左へ */
-}
-
-.curtain-open-right {
-  transform: translateX(100%); /* 右幕を右へ */
-}
-
-/* イントロ表示 */
+/* ==========================
+   イントロ・フェード
+   ========================== */
 #intro {
   position: absolute;
-  top: 20%;      /* 適宜調整 */
+  top: 20%;
   left: 50%;
   transform: translateX(-50%);
-  width: 80%;    /* 適宜調整 */
+  width: 80%;
   max-width: 400px;
   opacity: 0;
-  transition: opacity 1s ease-in-out; /* フェードイン/アウト */
-  z-index: 9999;  /* メッセージウインドウより下 */
+  transition: opacity 1s ease-in-out;
+  z-index: 9999;
   display: none;
 }
 
@@ -196,18 +187,18 @@ body {
   transition: opacity 0.8s ease;
   z-index: 8000;
 }
-.fade-active {
-  opacity: 1;
-}
+.fade-active { opacity: 1; }
+
 #deku {
   position: absolute;
-  left: 140px; /* 初期位置 luntu と同じ */
-  top: 50px;  
+  left: 140px;
+  top: 50px;
   width: 150px;
   display: none;
   transition: opacity 0.1s linear;
-  z-index: 100; /* luntu より前面に */
+  z-index: 100;
 }
+
 /* ==========================
    Luntu ターンダンス
    ========================== */
@@ -226,58 +217,57 @@ body {
 /* ==========================
    ▼ レトロ背景（夜空＋境界タイル＋地面タイル）
    ========================== */
-
 #backgroundLayer {
-  position: fixed;     /* ←重要！ブラウザ全体を覆う */
-  inset: 0;            /* top:0; left:0; right:0; bottom:0 と同じ */
+  position: fixed;
+  inset: 0;
   z-index: 0;
   pointer-events: none;
   overflow: hidden;
 }
 
-/* 夜空：塗りつぶし。紺〜群青系にすると雰囲気UP */
+/* 夜空 */
 #backgroundLayer .sky {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: calc(100% - 72px); /* 地面60〜72px分を差し引く */
+  height: calc(100% - 72px); /* top.png + soil 2段分想定 */
   background: #0b1a36;
 }
-
 
 /* 地面コンテナ */
 #backgroundLayer .ground {
   position: absolute;
-  top: 0;         /* bottom: 0 → top: 0 に変更 */
+  bottom: 0;
   width: 100%;
-  height: auto;
+  height: 72px; /* top.png 36px + soil 36px */
 }
 
-
-/* ▼ 1段だけ並べる境界タイル（top.png） */
+/* 境界タイル（top.png） */
 #backgroundLayer .ground-edge {
+  position: absolute;
+  top: 0;
   width: 100%;
-  height: 36px;   
+  height: 36px;
   background-image: url("top.png");
   background-repeat: repeat-x;
   background-size: 36px 36px;
   image-rendering: pixelated;
 }
 
-
-/* ▼ 下層の地面タイル（soil.png） */
+/* 下層地面タイル（soil.png） */
 #backgroundLayer .ground-body {
+  position: absolute;
+  top: 36px;
+  bottom: 0;
   width: 100%;
-  margin-top: 36px;   /* top.png の高さ分だけ下にずらす */
   background-image: url("soil.png");
   background-repeat: repeat;
   background-size: 36px 36px;
   image-rendering: pixelated;
 }
 
-
-/* Opening時は背景を非表示（ゲーム画面だけ隠す） */
+/* Opening 時は非表示 */
 #backgroundLayer.hidden {
   display: none;
 }
