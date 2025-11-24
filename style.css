@@ -256,7 +256,7 @@ body {
 /* ▼ 下層の地面タイル（soil.png） */
 #backgroundLayer .ground-body {
   width: 100%;
-  height: calc(100vh - 25% - 36px);  /* top.png の下から画面下まで */
+  height: calc(100vh - 25vh - 36px);  /* top.png の下から画面下まで */
   background-image: url("soil.png");
   background-repeat: repeat;
   background-size: 36px 36px;
