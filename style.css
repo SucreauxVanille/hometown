@@ -214,53 +214,49 @@ body {
   animation: luntuTurnDance 0.5s ease-in-out forwards;
 }
 
-/* ==========================
-   ▼ レトロ背景（夜空＋境界タイル＋地面タイル）
-   ========================== */
+/* -----------------------------
+   レトロ背景（top25%配置）
+   ----------------------------- */
 #backgroundLayer {
   position: fixed;
-  inset: 0;
-  z-index: 0;
+  inset: 0;               /* top:0; left:0; right:0; bottom:0 と同じ */
+  z-index: 0;             /* キャラより背面 */
   pointer-events: none;
   overflow: hidden;
 }
 
-/* 夜空 */
+/* 夜空：塗りつぶし */
 #backgroundLayer .sky {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: calc(100% - 72px); /* top.png + soil 2段分想定 */
-  background: #0b1a36;
+  height: 100%;
+  background: #0b1a36;   /* 夜空（濃紺〜群青） */
 }
 
 /* 地面コンテナ */
 #backgroundLayer .ground {
   position: absolute;
-  bottom: 0;
+  top: 25%;              /* top.png の上端に合わせる */
   width: 100%;
-  height: 72px; /* top.png 36px + soil 36px */
+  height: auto;
 }
 
-/* 境界タイル（top.png） */
+/* ▼ 境界タイル（top.png） */
 #backgroundLayer .ground-edge {
-  position: absolute;
-  top: 0;
   width: 100%;
-  height: 36px;
+  height: 36px;   
   background-image: url("top.png");
   background-repeat: repeat-x;
   background-size: 36px 36px;
   image-rendering: pixelated;
 }
 
-/* 下層地面タイル（soil.png） */
+/* ▼ 下層の地面タイル（soil.png） */
 #backgroundLayer .ground-body {
-  position: absolute;
-  top: 36px;
-  bottom: 0;
   width: 100%;
+  height: calc(100vh - 25% - 36px);  /* top.png の下から画面下まで */
   background-image: url("soil.png");
   background-repeat: repeat;
   background-size: 36px 36px;
