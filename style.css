@@ -12,6 +12,8 @@ body {
   width: 400px;
   height: 300px;
   overflow: hidden;
+  margin: auto;
+  z-index: 10;     /* 背景より前面 */
 }
 
 /* ルントウ */
@@ -226,14 +228,11 @@ body {
    ========================== */
 
 #backgroundLayer {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  overflow: hidden;
-  z-index: 0;        /* キャラより背面 */
+  position: fixed;     /* ←重要！ブラウザ全体を覆う */
+  inset: 0;            /* top:0; left:0; right:0; bottom:0 と同じ */
+  z-index: 0;
   pointer-events: none;
+  overflow: hidden;
 }
 
 /* 夜空：塗りつぶし。紺〜群青系にすると雰囲気UP */
@@ -242,9 +241,10 @@ body {
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;
-  background: #0b1a36;   /* 夜空（濃紺〜群青） */
+  height: calc(100% - 72px); /* 地面60〜72px分を差し引く */
+  background: #0b1a36;
 }
+
 
 /* 地面コンテナ */
 #backgroundLayer .ground {
