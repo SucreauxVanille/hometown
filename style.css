@@ -11,7 +11,7 @@ body {
   position: relative;
   width: 400px;
   height: 300px;
-  overflow: hidden;
+  overflow: visible;
   margin: auto;
   z-index: 10;     /* 背景より前面 */
 }
