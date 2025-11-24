@@ -220,3 +220,59 @@ body {
   animation: luntuTurnDance 0.5s ease-in-out forwards;
 }
 
+/* ==========================
+   ▼ レトロ背景（夜空＋境界タイル＋地面タイル）
+   ========================== */
+
+#backgroundLayer {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  z-index: 0;        /* キャラより背面 */
+  pointer-events: none;
+}
+
+/* 夜空：塗りつぶし。紺〜群青系にすると雰囲気UP */
+#backgroundLayer .sky {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #0b1a36;   /* 夜空（濃紺〜群青） */
+}
+
+/* 地面コンテナ */
+#backgroundLayer .ground {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: auto;
+}
+
+/* ▼ 1段だけ並べる境界タイル（top.png） */
+#backgroundLayer .ground-edge {
+  width: 100%;
+  height: 36px;   /* タイル1枚分の高さ */
+  background-image: url("top.png");
+  background-repeat: repeat-x;
+  background-size: 36px 36px;
+  image-rendering: pixelated;
+}
+
+/* ▼ 下層の地面タイル（soil.png） */
+#backgroundLayer .ground-body {
+  width: 100%;
+  background-image: url("soil.png");
+  background-repeat: repeat;
+  background-size: 36px 36px;
+  image-rendering: pixelated;
+}
+
+/* Opening時は背景を非表示（ゲーム画面だけ隠す） */
+#backgroundLayer.hidden {
+  display: none;
+}
