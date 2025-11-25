@@ -14,10 +14,10 @@ let openingActive = true;
 // ==============================
 // イントロ表示（フェードイン→静止→フェードアウト）
 // ==============================
-function showIntro(duration = 5000) {
+function showIntro(duration = 5500) {
   return new Promise(resolve => {
     intro.style.display = "block";
-    setTimeout(() => { intro.style.opacity = 1; }, 50); // フェードイン
+    setTimeout(() => { intro.style.opacity = 1; }, 55); // フェードイン
 
     setTimeout(() => {
       intro.style.opacity = 0; // フェードアウト
@@ -47,7 +47,7 @@ opening.addEventListener("click", async () => {
   await new Promise(r => setTimeout(r, 400)); // 暗転待機
 
   // イントロ表示
-  await showIntro(5000);
+  await showIntro(5500);
 
   document.getElementById("backgroundLayer").classList.remove("hidden");
 
