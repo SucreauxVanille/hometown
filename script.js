@@ -262,27 +262,43 @@ async function playGameOverSequence() {
 
 
 // -----------------------------
-// resetToOpening 修正版
+// resetToOpening 修正版（intro.gif 再読み込み対応）
 // -----------------------------
 function resetToOpening() {
+  // ゲーム画面非表示・オープニング表示
   game.style.display = "none";
   opening.style.display = "flex";
 
+  // カーテン初期化
   curtainLeft.style.display = "block";
   curtainRight.style.display = "block";
   curtainLeft.className = "curtain";    
   curtainRight.className = "curtain";
 
+  // Press 初期化
   openingPress.style.display = "block";
   openingPress.classList.remove("press-flash");
 
-  // luntuを初期位置・表示状態に戻す
+  // luntu 初期化
   luntu.style.left = "120px";
   luntu.style.top = "40px";
   luntu.style.opacity = 1;
 
-  deku.style.display = "none"; // 念のため
+  // deku 非表示
+  deku.style.display = "none";
 
+  // -----------------------------
+  // intro.gif 再読み込みしてアニメーションリセット
+  // -----------------------------
+  intro.style.display = "block";
+  intro.style.opacity = 1;
+  const gifSrc = "intro.gif";
+  intro.src = "";                // 一旦空にする
+  setTimeout(() => { 
+    intro.src = gifSrc;          // 再設定 → アニメーション再生
+  }, 10);
+
+  // オープニング有効化
   openingActive = true;
 }
 
