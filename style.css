@@ -269,12 +269,7 @@ body {
 }
 
 /* 点滅アニメーション */
-.blink {
-  animation: blinkAnim 0.4s infinite;
+.flash {
+  animation: flashAnim 0.2s linear infinite; /* ← 永続点滅 */
 }
 
-@keyframes blinkAnim {
-  0%   { opacity: 1; }
-  50%  { opacity: 0.4; }
-  100% { opacity: 1; }
-}
