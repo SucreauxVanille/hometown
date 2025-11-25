@@ -277,8 +277,8 @@ function resetToOpening() {
   openingPress.classList.remove("press-flash");
 
   // luntuを初期位置・表示状態に戻す
-  luntu.style.left = "150px";
-  luntu.style.top = "60px";
+  luntu.style.left = "120px";
+  luntu.style.top = "40px";
   luntu.style.opacity = 1;
 
   deku.style.display = "none"; // 念のため
@@ -286,6 +286,19 @@ function resetToOpening() {
   openingActive = true;
 }
 
+/ 照準関連 /
+
+let selectedIndex = null; // ← 新規：照準中のスイカ
+
+function setFlash(index) {
+  // 既存の flash を全部消す
+  watermelons.forEach(w => w.classList.remove("flash"));
+
+  if (index === null) return;
+
+  // 新しい flash を付ける
+  watermelons[index].classList.add("flash");
+}
 
 // -----------------------------
 // メイン：スイカクリック処理
@@ -294,15 +307,19 @@ watermelons.forEach((wm, index) => {
   wm.addEventListener("click", async () => {
     if (!gameEnabled) return;
 
-    if (lastClicked !== index) repeatCount = 0;
-    else repeatCount++;
-    if (repeatCount >= 2) return;
-
-    if (lastClicked !== index) {
+    // （1）初回クリック → そのスイカに照準（flash付与）
+    if (selectedIndex !== index) {
+      selectedIndex = index;
+      setFlash(index);  // ← ここで点滅付与
       lastClicked = index;
-      moveLuntuTo(wm);
+      repeatCount = 0;
+      moveLuntuTo(wm);  // ← 移動は今まで通り
       return;
     }
+
+    // （2）同じスイカを2回クリック → 攻撃処理に進む
+    repeatCount++;
+    if (repeatCount >= 2) return;
 
     await showAttackMessage(400);
 
@@ -312,6 +329,7 @@ watermelons.forEach((wm, index) => {
     luntu.classList.remove("jump");
     wm.classList.remove("flash");
 
+    // （3）当たり判定
     if (index === charIndex) {
       playHitSequence();
     } else {
@@ -321,20 +339,22 @@ watermelons.forEach((wm, index) => {
       }
       wm.style.display = "none";
 
-if (missCount >= 2) {
-  showMessage(MSG_MISS, () => {
-    // 従来の resetToOpening → 新演出関数に差し替え
-    playGameOverSequence();
-  });
-} else {
-  showMessage(MSG_MISS);
-}
-
+      if (missCount >= 2) {
+        showMessage(MSG_MISS, () => {
+          playGameOverSequence();
+        });
+      } else {
+        showMessage(MSG_MISS);
+      }
     }
 
+    // 全ての照準解除
+    selectedIndex = null;
+    setFlash(null);
     lastClicked = null;
   });
 });
+
 // -----------------------------
 // 勝利の舞（改良版）
 // -----------------------------
@@ -342,7 +362,7 @@ async function playClearDance() {
   gameEnabled = false;
 
   // 中央に移動
-  luntu.style.left = "130px";
+  luntu.style.left = "120px";
   luntu.style.top = "40px";
 
   // ジャンプ×2 → 回転 ×1 を2セット
