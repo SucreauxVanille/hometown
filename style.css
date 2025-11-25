@@ -269,6 +269,10 @@ body {
 }
 
 /* 点滅アニメーション */
+@keyframes flashAnim {
+  0%   { opacity: 1; }
+  100% { opacity: 0; }
+}
 .flash {
   animation: flashAnim 0.2s linear infinite; /* ← 永続点滅 */
 }
