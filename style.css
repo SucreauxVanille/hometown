@@ -267,3 +267,14 @@ body {
 #backgroundLayer.hidden {
   display: none;
 }
+
+/* 点滅アニメーション */
+.blink {
+  animation: blinkAnim 0.4s infinite;
+}
+
+@keyframes blinkAnim {
+  0%   { opacity: 1; }
+  50%  { opacity: 0.4; }
+  100% { opacity: 1; }
+}
