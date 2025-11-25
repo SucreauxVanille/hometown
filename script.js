@@ -286,72 +286,102 @@ function resetToOpening() {
   openingActive = true;
 }
 
-/ 照準関連 /
+/* ================================
+   照準管理
+================================= */
 
-let selectedIndex = null; // ← 新規：照準中のスイカ
+let selectedIndex = null; // ← いま照準中のスイカ index
 
 function setFlash(index) {
-  // 既存の flash を全部消す
+  // 全スイカの flash をリセット
   watermelons.forEach(w => w.classList.remove("flash"));
 
   if (index === null) return;
 
-  // 新しい flash を付ける
+  // 該当スイカのみ flash 開始
   watermelons[index].classList.add("flash");
 }
 
-// -----------------------------
-// メイン：スイカクリック処理
-// -----------------------------
+/* ================================
+   スイカクリック処理（照準＋攻撃）
+================================= */
+
 watermelons.forEach((wm, index) => {
   wm.addEventListener("click", async () => {
+
     if (!gameEnabled) return;
 
-    // （1）初回クリック → そのスイカに照準（flash付与）
+    /* -----------------------------
+       （1）初回クリック：照準開始
+    ------------------------------ */
     if (selectedIndex !== index) {
-      selectedIndex = index;
-      setFlash(index);  // ← ここで点滅付与
+
+      selectedIndex = index;   // 新しく照準
+      setFlash(index);         // flash付与（永続）
       lastClicked = index;
       repeatCount = 0;
-      moveLuntuTo(wm);  // ← 移動は今まで通り
+
+      moveLuntuTo(wm);         // ルントウを移動
       return;
     }
 
-    // （2）同じスイカを2回クリック → 攻撃処理に進む
+    /* -----------------------------
+       （2）同じスイカの2回目クリック → 攻撃
+    ------------------------------ */
     repeatCount++;
     if (repeatCount >= 2) return;
 
     await showAttackMessage(400);
 
     luntu.classList.add("jump");
-    wm.classList.add("flash");
+
     await new Promise(r => setTimeout(r, 300));
     luntu.classList.remove("jump");
-    wm.classList.remove("flash");
 
-    // （3）当たり判定
+    // ※ここでは flash を外さない
+    // 次の操作まで flash（照準）は残す
+
+    /* -----------------------------
+       （3）当たり判定
+    ------------------------------ */
+
     if (index === charIndex) {
-      playHitSequence();
-    } else {
-      if (!missedIndexes.has(index)) {
-        missedIndexes.add(index);
-        missCount++;
-      }
-      wm.style.display = "none";
+      // 正解ヒット
+      setFlash(null);        // 全照準解除
+      selectedIndex = null;
+      lastClicked = null;
 
-      if (missCount >= 2) {
-        showMessage(MSG_MISS, () => {
-          playGameOverSequence();
-        });
-      } else {
-        showMessage(MSG_MISS);
-      }
+      playHitSequence();
+      return;
     }
 
-    // 全ての照準解除
-    selectedIndex = null;
-    setFlash(null);
-    lastClicked = null;
+    // 不正解スイカ処理
+    if (!missedIndexes.has(index)) {
+      missedIndexes.add(index);
+      missCount++;
+    }
+    wm.style.display = "none";
+
+    if (missCount >= 2) {
+      // Game Over
+      setFlash(null);         // 全照準解除
+      selectedIndex = null;
+      lastClicked = null;
+
+      showMessage(MSG_MISS, () => {
+        playGameOverSequence();
+      });
+
+    } else {
+      // 1回目ミスならメッセージだけ
+      showMessage(MSG_MISS);
+
+      // 今のスイカは消えたので照準も消去
+      setFlash(null);
+      selectedIndex = null;
+      lastClicked = null;
+    }
+
   });
 });
 
