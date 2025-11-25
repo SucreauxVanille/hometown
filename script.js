@@ -262,7 +262,7 @@ async function playGameOverSequence() {
 
 
 // -----------------------------
-// resetToOpening 修正版（intro.gif 再読み込み対応）
+// resetToOpening 修正版（introは非表示のままリロード）
 // -----------------------------
 function resetToOpening() {
   // ゲーム画面非表示・オープニング表示
@@ -284,21 +284,20 @@ function resetToOpening() {
   luntu.style.top = "40px";
   luntu.style.opacity = 1;
 
-  // deku 非表示
   deku.style.display = "none";
 
   // -----------------------------
-  // intro.gif 再読み込みしてアニメーションリセット
+  // intro.gif 再読み込み（ただし非表示のまま！）
   // -----------------------------
-  intro.style.display = "block";
-  intro.style.opacity = 1;
+  intro.style.display = "none";   // ← ここが重要
+  intro.style.opacity = 0;
+
   const gifSrc = "intro.gif";
-  intro.src = "";                // 一旦空にする
+  intro.src = "";                
   setTimeout(() => { 
-    intro.src = gifSrc;          // 再設定 → アニメーション再生
+    intro.src = gifSrc;          
   }, 10);
 
-  // オープニング有効化
   openingActive = true;
 }
 
