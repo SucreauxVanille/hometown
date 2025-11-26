@@ -114,10 +114,25 @@ async function playHitSequence() {
 
   await playClearDance();
 
-  // Stage2 開始
+  // ★ stage2.js を読み込む
+  await loadStage2Script();
+
+  // ★ stage2 が準備できたら開始
   startStage2();
 
 }
+
+// ステージ2
+function loadStage2Script() {
+  return new Promise((resolve, reject) => {
+    const s = document.createElement("script");
+    s.src = "stage2.js";
+    s.onload = resolve;
+    s.onerror = reject;
+    document.body.appendChild(s);
+  });
+}
+
 
 // -----------------------------
 // ゲームオーバー演出
