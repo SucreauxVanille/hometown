@@ -45,6 +45,13 @@ function showMessage(imgName, onClick = null) {
 // ゲーム初期化
 // -----------------------------
 function initGame() {
+  // Stage1 では w3, w4 を非表示
+  ["w3", "w4"].forEach(id => {
+    const w = document.getElementById(id);
+    if (w) w.style.display = "none";
+  });
+
+  // 既存処理
   watermelons.forEach(w => {
     w.style.display = "block";
     w.classList.remove("flash");
@@ -104,8 +111,10 @@ async function playHitSequence() {
 
   showMessage(MSG_HIT3, async () => {
     await playClearDance();
-    showMessage(MSG_CLEAR, resetToOpening); // opening.js 側関数
-    gameEnabled = true;
+    showMessage(MSG_CLEAR, () => {
+    loadStage2();  // ★ これだけ追加
+});
+
   });
 }
 
