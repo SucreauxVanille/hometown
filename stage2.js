@@ -193,44 +193,35 @@ function startStage2() {
 
     luntu.style.left = "120px";
     luntu.style.top  = "40px";
+    luntu.style.display = "block";
   }
 
-// ==============================
-// Stage2 開始演出
-curtainLeft.style.display  = "block";
-curtainRight.style.display = "block";
-curtainLeft.classList.add("curtain-show");
-curtainRight.classList.add("curtain-show");
+  // ==============================
+  // Stage2 開始演出
+  // カーテン出現（暗転）
+  curtainLeft.style.display  = "block";
+  curtainRight.style.display = "block";
+  setTimeout(() => {
+    curtainLeft.classList.add("curtain-show");
+    curtainRight.classList.add("curtain-show");
+  }, 50); // 表示確定のため短遅延
 
-// next.gif 表示
-intro.src = "next.gif";
-intro.style.opacity = 0;
-intro.style.display = "block";
-
-// フェードイン
-setTimeout(() => {
-  intro.style.transition = "opacity 0.6s";
-  intro.style.opacity = 1;
-}, 200);
-
-// フェードアウト開始（7秒間表示）
-setTimeout(() => {
-  intro.style.transition = "opacity 0.6s";
+  // next.gif 表示
+  intro.src = "next.gif";
   intro.style.opacity = 0;
-}, 7200);
+  intro.style.display = "block";
+  setTimeout(() => { intro.style.transition = "opacity 0.6s"; intro.style.opacity = 1; }, 100);
+  setTimeout(() => { intro.style.transition = "opacity 0.6s"; intro.style.opacity = 0; }, 7100); // 7秒表示
 
-// フェードアウト終了後にカーテン開き・Stage2初期化
-setTimeout(() => {
-  intro.style.display = "none";
-  curtainLeft.classList.remove("curtain-show");
-  curtainRight.classList.remove("curtain-show");
-  curtainLeft.classList.add("curtain-open");
-  curtainRight.classList.add("curtain-open");
+  // フェードアウト完了後にカーテン開き & Stage2初期化
+  setTimeout(() => {
+    intro.style.display = "none";
+    curtainLeft.classList.remove("curtain-show");
+    curtainRight.classList.remove("curtain-show");
+    curtainLeft.classList.add("curtain-open-left");
+    curtainRight.classList.add("curtain-open-right");
 
-  // Stage2 ゲーム初期化
-  initStage2();
-  stage2Enabled = true;
-}, 7800);
-
+    initStage2();
+    stage2Enabled = true;
+  }, 7800);
 }
-
