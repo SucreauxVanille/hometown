@@ -101,8 +101,10 @@ function showAttackMessage(duration = 700) {
 // -----------------------------
 // 当たり演出
 // -----------------------------
+
 async function playHitSequence() {
   gameEnabled = false;
+  
   showMessage(MSG_HIT1);
   await new Promise(r => setTimeout(r, 600));
 
@@ -112,17 +114,35 @@ async function playHitSequence() {
   showMessage(MSG_HIT3);
   await new Promise(r => setTimeout(r, 600));
 
+  // 勝利の舞
   await playClearDance();
 
-  // ★ stage2.js を読み込む
+  // -------------------------
+  // Stage1 のオブジェクトを非表示・無効化
+  // -------------------------
+  watermelons.forEach(w => w.style.display = "none");
+  luntu.style.display = "none";
+
+  // -------------------------
+  // カーテン出現（暗転）
+  // -------------------------
+  curtainLeft.style.display = "block";
+  curtainRight.style.display = "block";
+  curtainLeft.classList.add("curtain-close");
+  curtainRight.classList.add("curtain-close");
+
+  // -------------------------
+  // Stage2.js 読み込み
+  // -------------------------
   await loadStage2Script();
 
-  // ★ stage2 が準備できたら開始
+  // -------------------------
+  // Stage2 開始（カーテン・next.gif 演出は stage2 内で処理）
+  // -------------------------
   startStage2();
-
 }
 
-// ステージ2
+// ステージ2スクリプト読み込み
 function loadStage2Script() {
   return new Promise((resolve, reject) => {
     const s = document.createElement("script");
