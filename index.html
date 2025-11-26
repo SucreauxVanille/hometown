@@ -13,12 +13,26 @@
     <img id="openingPress" src="press.png" alt="press">
     <img id="openingCopy" src="copyright.png" alt="copy">
 </div>
-<!-- 黒幕（左右カーテン） -->
 <div id="curtainLeft" class="curtain"></div>
 <div id="curtainRight" class="curtain"></div>
 <div id="fadeBlack"></div>
 <img src="intro.gif" id="intro">
-  <!-- ▼ フルスクリーン背景 -->
+<div id="backgroundLayer" class="hidden">
+  <div class="sky"></div>
+  <div class="ground">
+    <div class="ground-edge"></div>
+    <div class="ground-body"></div>
+  </div>
+</div>
+<div id="game">
+  <img src="watermelon.png" class="watermelon" id="w0" style="left:20px; top:150px;">
+  <img src="watermelon.png" class="watermelon" id="w1" style="left:160px; top:150px;">
+  <img src="watermelon.png" class="watermelon" id="w2" style="left:300px; top:150px;">
+  <img src="luntu.gif" id="luntu" style="left:120px; top:40px;">
+  <img id="deku" src="deku.png">
+  <div id="messageWindow" class="message-window">
+    <img id="messageImage" src="" alt="">  
+  </div>
   <div id="backgroundLayer" class="hidden">
     <div class="sky"></div>
     <div class="ground">
@@ -26,35 +40,9 @@
       <div class="ground-body"></div>
     </div>
   </div>
-
-  <!-- ▼ 中央に固定される 400×300 のステージ -->
-<div id="game">
-  <!-- ▼ スイカ3つ -->
-  <img src="watermelon.png" class="watermelon" id="w0" style="left:20px; top:150px;">
-  <img src="watermelon.png" class="watermelon" id="w1" style="left:160px; top:150px;">
-  <img src="watermelon.png" class="watermelon" id="w2" style="left:300px; top:150px;">
-
-  <!-- ▼ ルントウ -->
-  <img src="luntu.gif" id="luntu" style="left:120px; top:40px;">
-  <img id="deku" src="deku.png">
-  <!-- ▼ メッセージウインドウ -->
-  <div id="messageWindow" class="message-window">
-    <img id="messageImage" src="" alt="">  
-  </div>
-  <!-- ▼ 背景 -->
-  <div id="backgroundLayer" class="hidden">
-  <div class="sky"></div>
-
-  <div class="ground">
-    <div class="ground-edge"></div>
-    <div class="ground-body"></div>
-  </div>
 </div>
-
-</div>
-
 <script src="opening.js"></script>
 <script src="script.js"></script>
-
 </body>
 </html>
+>
