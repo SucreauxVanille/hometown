@@ -201,8 +201,8 @@ function startStage2() {
 
 curtainLeft.style.display  = "block";
 curtainRight.style.display = "block";
-curtainLeft.classList.add("curtain-close");
-curtainRight.classList.add("curtain-close");
+curtainLeft.classList.add("curtain-show");
+curtainRight.classList.add("curtain-show");
 
 // next.gif 表示
 intro.src = "next.gif";
