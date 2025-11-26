@@ -109,13 +109,14 @@ async function playHitSequence() {
   showMessage(MSG_HIT2);
   await new Promise(r => setTimeout(r, 600));
 
-  showMessage(MSG_HIT3, async () => {
-    await playClearDance();
-    showMessage(MSG_CLEAR, () => {
-    startStage2();  // ★ これだけ追加
-});
+  showMessage(MSG_HIT3);
+  await new Promise(r => setTimeout(r, 600));
 
-  });
+  await playClearDance();
+
+  // Stage2 開始
+  startStage2();
+
 }
 
 // -----------------------------
