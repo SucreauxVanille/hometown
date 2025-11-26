@@ -112,7 +112,7 @@ async function playHitSequence() {
   showMessage(MSG_HIT3, async () => {
     await playClearDance();
     showMessage(MSG_CLEAR, () => {
-    loadStage2();  // ★ これだけ追加
+    startStage2();  // ★ これだけ追加
 });
 
   });
