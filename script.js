@@ -1,5 +1,5 @@
 // =====================
-// Stage 2対応 完全版 script.js
+// Stage 2対応 完全版 script.js（修正版）
 // =====================
 
 // =====================
@@ -13,6 +13,9 @@ let repeatCount = 0;
 let missCount = 0;         
 let missedIndexes = new Set();
 let charIndex = 0;         // 当たりスイカ index
+
+// イベント重複防止ガード
+let handlersInitialized = false;
 
 // DOM取得
 const game = document.getElementById("game");
@@ -43,6 +46,8 @@ let watermelons = []; // スイカDOMの配列
 function showMessage(imgName, onClick = null) {
   msgImage.src = imgName;
   msgWindow.style.display = "block";
+  // 上書きされる可能性を考慮して一旦解除してから再設定
+  msgWindow.onclick = null;
   msgWindow.onclick = () => {
     msgWindow.style.display = "none";
     if (onClick) onClick();
@@ -59,13 +64,21 @@ function setupStage1() {
     document.getElementById("w1"),
     document.getElementById("w2")
   ];
-  // Stage1で不要なw3,w4は非表示
+  // Stage1で不要なw3,w4は非表示（ある場合）
   [ "w3", "w4" ].forEach(id => {
     const w = document.getElementById(id);
-    if (w) w.style.display = "none";
+    if (w) {
+      w.style.display = "none";
+      w.classList.remove("flash");
+    }
   });
 
-  watermelons.forEach(w => w.style.display = "block");
+  watermelons.forEach(w => {
+    if (w) {
+      w.style.display = "block";
+      w.classList.remove("flash");
+    }
+  });
   charIndex = Math.floor(Math.random() * 3);
 
   resetLuntu();
@@ -93,9 +106,11 @@ function setupStage2() {
     {x: 280, y: 200}
   ];
   watermelons.forEach((w, i) => {
+    if (!w) return;
     w.style.left = pos[i].x + "px";
     w.style.top  = pos[i].y + "px";
     w.style.display = "block";
+    w.classList.remove("flash");
   });
   charIndex = Math.floor(Math.random() * 5);
 
@@ -181,8 +196,10 @@ function resetIntro() {
 // スイカ点滅
 // =====================
 function setFlash(index) {
-  watermelons.forEach(w => w.classList.remove("flash"));
-  if (index !== null) watermelons[index].classList.add("flash");
+  watermelons.forEach(w => {
+    if (w) w.classList.remove("flash");
+  });
+  if (index !== null && watermelons[index]) watermelons[index].classList.add("flash");
 }
 
 // =====================
@@ -212,18 +229,35 @@ function showAttackMessage(duration=700) {
 }
 
 // =====================
-// スイカクリック初期化
+// ゲームオーバー演出（簡易：他ファイルで詳細実装している場合はそちらを使用）
+// =====================
+async function playGameOverSequence() {
+  // ここでは簡易にオーバー→オープニングへ戻す
+  showMessage(MSG_GAMEOVER, resetToOpening);
+}
+
+// =====================
+// スイカクリック初期化（1回だけ登録）
 // =====================
 function initClickHandlers() {
-  watermelons.forEach((wm, index) => {
+  if (handlersInitialized) return;
+  handlersInitialized = true;
+
+  // イベントは watermelons 配列が setupStageX() によりセットされた後で発火する想定です。
+  // ただし、要素自体は DOM に存在しているためここで参照可能です。
+  const allIds = ["w0","w1","w2","w3","w4"];
+  allIds.forEach((id, idx) => {
+    const wm = document.getElementById(id);
+    if (!wm) return;
     wm.addEventListener("click", async () => {
       if (!gameEnabled) return;
 
-      if (selectedIndex !== index) {
-        selectedIndex = index;
-        lastClicked = index;
+      // selectedIndex / lastClicked / repeatCount の連続クリックガード
+      if (selectedIndex !== idx) {
+        selectedIndex = idx;
+        lastClicked = idx;
         repeatCount = 0;
-        setFlash(index);
+        setFlash(idx);
         moveLuntuTo(wm);
         return;
       }
@@ -233,15 +267,34 @@ function initClickHandlers() {
 
       await showAttackMessage(400);
 
-      if (index === charIndex) {
+      // 判定（現在の charIndex は stage に依存）
+      // 当該 idx が水マークの配列内で valid かどうかは stage セットアップで調整される
+      // ここでは index の比較で判定
+      if (idx === charIndex) {
+        // ヒット
+        setFlash(null);
+        selectedIndex = null;
+        lastClicked = null;
         if (currentStage === 1) playStageClearSequence();
         else playFinalClearSequence();
       } else {
+        // ミス
         wm.style.display = "none";
-        missCount++;
-        if (missCount >= 2) resetToOpening();
+        if (!missedIndexes.has(idx)) {
+          missedIndexes.add(idx);
+          missCount++;
+        }
+        if (missCount >= 2) {
+          // game over：詳細な演出が別にある場合は playGameOverSequence を差し替えてください
+          showMessage(MSG_MISS, () => {
+            playGameOverSequence();
+          });
+        } else {
+          showMessage(MSG_MISS);
+        }
       }
 
+      // 照準解除
       selectedIndex = null;
       setFlash(null);
     });
@@ -249,13 +302,28 @@ function initClickHandlers() {
 }
 
 // =====================
-// ゲーム開始（opening.js側が呼ぶ）
+// 元の initGame を復活：ステージ準備→ハンドラ登録→スタートメッセージ
+// =====================
+function initGame() {
+  // デフォルトは Stage1 を準備
+  setupStage1();
+
+  // クリックハンドラは一度だけ登録
+  initClickHandlers();
+
+  // ルントウ等初期化（念のため）
+  resetLuntu();
+
+  // メッセージ表示で開始待ち（ユーザーがクリックすると gameEnabled=true）
+  game.style.display = "block";
+  showMessage(MSG_START, () => {
+    gameEnabled = true;
+  });
+}
+
+// =====================
+// opening.js 等が呼ぶ入口
 // =====================
 function startGame() {
-  setupStage1();
-  initClickHandlers();
-  game.style.display = "block";
-
-  // スタートメッセージで操作開始
-  showMessage(MSG_START, () => { gameEnabled = true; });
+  initGame();
 }
