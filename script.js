@@ -128,8 +128,8 @@ async function playHitSequence() {
   // -------------------------
   curtainLeft.style.display = "block";
   curtainRight.style.display = "block";
-  curtainLeft.classList.add("curtain-close");
-  curtainRight.classList.add("curtain-close");
+  curtainLeft.classList.add("curtain-show");
+  curtainRight.classList.add("curtain-show");
 
   // -------------------------
   // Stage2.js 読み込み
