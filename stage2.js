@@ -1,16 +1,6 @@
-console.log("stage2.js loaded");
-
 // ============================================
-// Stage 2 完全版：stage2.js
+// Stage 2 完全版：stage2.js（DOM再宣言削除版）
 // ============================================
-
-// DOM取得
-const curtainLeft = document.getElementById("curtainLeft");
-const curtainRight = document.getElementById("curtainRight");
-const intro = document.getElementById("intro");
-const luntu = document.getElementById("luntu");
-const msgWindow = document.getElementById("messageWindow");
-const msgImage = document.getElementById("messageImage");
 
 // スイカ DOM（index.html に w0～w4 を配置済みとする）
 const stage2Watermelons = [
@@ -185,7 +175,7 @@ function stage2ClickHandler(wm, index) {
 }
 
 // -----------------------------
-// ステージ2 初期化
+// Stage2 初期化
 // -----------------------------
 function initStage2Game() {
   stage2Watermelons.forEach((w, i) => {
