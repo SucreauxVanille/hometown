@@ -197,27 +197,41 @@ function startStage2() {
 
   // ==============================
   // 開始演出
-  curtainLeft.style.display  = "block";
-  curtainRight.style.display = "block";
-  curtainLeft.classList.add("curtain-close");
-  curtainRight.classList.add("curtain-close");
+// ==============================
 
-  intro.src = "next.gif";
+curtainLeft.style.display  = "block";
+curtainRight.style.display = "block";
+curtainLeft.classList.add("curtain-close");
+curtainRight.classList.add("curtain-close");
+
+// next.gif 表示
+intro.src = "next.gif";
+intro.style.opacity = 0;
+intro.style.display = "block";
+
+// フェードイン
+setTimeout(() => {
+  intro.style.transition = "opacity 0.6s";
+  intro.style.opacity = 1;
+}, 200);
+
+// フェードアウト開始（表示 7 秒間）
+setTimeout(() => {
+  intro.style.transition = "opacity 0.6s";
   intro.style.opacity = 0;
-  intro.style.display = "block";
+}, 7200); // 7秒後にフェードアウト
 
-  setTimeout(() => { intro.style.transition = "opacity 0.6s"; intro.style.opacity = 1; }, 600);
-  setTimeout(() => { intro.style.opacity = 0; }, 1800);
+// カーテンオープン・ステージ初期化
+setTimeout(() => {
+  intro.style.display = "none";
+  curtainLeft.classList.remove("curtain-close");
+  curtainRight.classList.remove("curtain-close");
+  curtainLeft.classList.add("curtain-open");
+  curtainRight.classList.add("curtain-open");
 
-  setTimeout(() => {
-    intro.style.display = "none";
-    curtainLeft.classList.remove("curtain-close");
-    curtainRight.classList.remove("curtain-close");
-    curtainLeft.classList.add("curtain-open");
-    curtainRight.classList.add("curtain-open");
+  initStage2();
+  stage2Enabled = true;
+}, 7800); // フェードアウト終了後にカーテン開く
 
-    initStage2();
-    stage2Enabled = true;
-  }, 2600);
 }
 
