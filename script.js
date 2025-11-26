@@ -172,9 +172,30 @@ function initClickHandlers() {
   });
 }
 
-// ダミー
-function moveLuntuTo(){ }
-function showAttackMessage(){ return new Promise(r=>setTimeout(r,300)); }
+// 移動とウインドウ
+function moveLuntuTo(target) {
+  const targetCenterX = target.offsetLeft + target.offsetWidth / 2;
+  const luntuLeft = targetCenterX - luntu.offsetWidth / 2;
+  const luntuTop = target.offsetTop - luntu.offsetHeight - 0.2 * luntu.offsetHeight;
+  luntu.style.left = `${luntuLeft}px`;
+  luntu.style.top = `${luntuTop}px`;
+}
+
+function showAttackMessage(duration = 700) {
+  return new Promise(resolve => {
+    gameEnabled = false;
+    const msgWindow = document.getElementById("messageWindow");
+    const msgImage  = document.getElementById("messageImage");
+    msgImage.src = "attack.png";
+    msgWindow.style.display = "block";
+    setTimeout(() => {
+      msgWindow.style.display = "none";
+      gameEnabled = true;
+      resolve();
+    }, duration);
+  });
+}
+
 
 // =====================
 // ゲーム開始（opening.js側が呼ぶ）
