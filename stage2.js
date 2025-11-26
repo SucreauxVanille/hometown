@@ -195,10 +195,8 @@ function startStage2() {
     luntu.style.top  = "40px";
   }
 
-  // ==============================
-  // 開始演出
 // ==============================
-
+// Stage2 開始演出
 curtainLeft.style.display  = "block";
 curtainRight.style.display = "block";
 curtainLeft.classList.add("curtain-show");
@@ -215,23 +213,24 @@ setTimeout(() => {
   intro.style.opacity = 1;
 }, 200);
 
-// フェードアウト開始（表示 7 秒間）
+// フェードアウト開始（7秒間表示）
 setTimeout(() => {
   intro.style.transition = "opacity 0.6s";
   intro.style.opacity = 0;
-}, 7200); // 7秒後にフェードアウト
+}, 7200);
 
-// カーテンオープン・ステージ初期化
+// フェードアウト終了後にカーテン開き・Stage2初期化
 setTimeout(() => {
   intro.style.display = "none";
-  curtainLeft.classList.remove("curtain-close");
-  curtainRight.classList.remove("curtain-close");
+  curtainLeft.classList.remove("curtain-show");
+  curtainRight.classList.remove("curtain-show");
   curtainLeft.classList.add("curtain-open");
   curtainRight.classList.add("curtain-open");
 
+  // Stage2 ゲーム初期化
   initStage2();
   stage2Enabled = true;
-}, 7800); // フェードアウト終了後にカーテン開く
+}, 7800);
 
 }
 
