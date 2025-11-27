@@ -172,7 +172,6 @@ body {
   width: 400px;
   max-width: 100%;
   height: auto;
-  transform: translate(-50%, -50%);
   opacity: 0;
   transition: opacity 1s ease-in-out;
   z-index: 9999;
