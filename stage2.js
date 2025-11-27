@@ -211,18 +211,84 @@ function st2_click(w, idx) {
     });
   }
 
-  // ==============================
-  // ゲームオーバー演出
-  // ==============================
-  function st2_gameover() {
-    stage2Enabled = false;
-    st2_showMsg(ST2_MSG_MISS, () => {
-      st2_showMsg(ST2_MSG_GAMEOVER, () => {
-        removeStage2Watermelons();
-        resetToOpening();
-      });
-    });
+// ==============================
+// Stage2 ゲームオーバー演出
+// ==============================
+async function st2_gameover() {
+  stage2Enabled = false;
+
+  // スイカを削除
+  removeStage2Watermelons();
+
+  // ミスメッセージ表示（任意で短時間固定表示）
+  st2_showMsg(ST2_MSG_MISS);
+
+  await new Promise(r => setTimeout(r, 1500)); // 1.5秒表示
+
+  // ゲームオーバー表示
+  msgImage.src = "gameover.png";
+  msgWindow.style.display = "block";
+
+  // deku 準備
+  deku.style.position = "absolute";
+  deku.style.opacity = 0;
+  deku.style.display = "block";
+  deku.style.visibility = "hidden";
+
+  const startLeft = luntu.offsetLeft;
+  const startTop  = luntu.offsetTop;
+  deku.style.left = startLeft + "px";
+  deku.style.top  = startTop + "px";
+  deku.style.visibility = "visible";
+
+  const followInterval = setInterval(() => {
+    deku.style.left = luntu.offsetLeft + "px";
+    deku.style.top  = luntu.offsetTop + "px";
+  }, 40);
+
+  // luntu 点滅
+  let intervalTime = 200;
+  for (let i = 0; i < 10; i++) {
+    luntu.style.opacity = i % 2 === 0 ? 1 : 0;
+    deku.style.opacity = 0;
+    await new Promise(r => setTimeout(r, intervalTime));
   }
+
+  // luntu & deku 交互点滅
+  intervalTime = 200;
+  for (let i = 0; i < 20; i++) {
+    luntu.style.opacity = i % 2 === 0 ? 1 : 0;
+    deku.style.opacity  = i % 2 === 0 ? 0 : 1;
+    await new Promise(r => setTimeout(r, intervalTime));
+    if (i === 9) intervalTime = 120;
+    if (i === 14) intervalTime = 60;
+  }
+
+  // deku 点滅
+  luntu.style.opacity = 0;
+  intervalTime = 60;
+  for (let i = 0; i < 20; i++) {
+    deku.style.opacity = i % 2 === 0 ? 1 : 0;
+    await new Promise(r => setTimeout(r, intervalTime));
+    if (i === 9) intervalTime = 120;
+    if (i === 14) intervalTime = 200;
+  }
+
+  deku.style.opacity = 1;
+  clearInterval(followInterval);
+
+  // クリックで閉じる
+  await new Promise(r => setTimeout(r, 500));
+  msgWindow.onclick = () => {
+    msgWindow.style.display = "none";
+    deku.style.display = "none";
+    deku.style.opacity = 0;
+    luntu.style.opacity = 1;
+    luntu.style.display = "block";
+    resetToOpening();
+  };
+}
+
 
   // ==============================
   // 初期化
