@@ -157,13 +157,16 @@ function st2_click(w, idx) {
       st2_flash(null);
       st2SelectedIndex = null;
 
-      if (st2MissCount >= 2) {
-        // ゲームオーバー
-        st2_gameover();
-      } else {
-        // 単なるミス
-        st2_showMsg(ST2_MSG_MISS);
-      }
+  if (st2MissCount >= 2) {
+    // ゲームオーバー前にミスメッセージを表示
+    st2_showMsg(ST2_MSG_MISS);
+    setTimeout(() => {
+      st2_gameover();
+    }, 1500); // 1.5秒後にゲームオーバー
+  } else {
+    // 単なるミス
+    st2_showMsg(ST2_MSG_MISS);
+  }
     }
 
     stage2Enabled = true;  // クリック再有効化
