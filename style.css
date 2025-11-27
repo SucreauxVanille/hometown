@@ -167,10 +167,11 @@ body {
    ========================== */
 #intro {
   position: absolute;
-  top: 20%;
   left: 50%;
-  transform: translateX(-50%);
-  width: 80%;
+  top: 50%;
+  width: 260px;         /* messageImage と同じ */
+  height: auto;
+  transform: translate(-50%, -50%);
   max-width: 400px;
   opacity: 0;
   transition: opacity 1s ease-in-out;
