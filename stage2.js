@@ -13,8 +13,8 @@ const ST2_MSG_MISS   = "miss.png";
 
 // ==============================
 // ゲーム管理変数（stage2専用）
-let stage2CharIndex, stage2SelectedIndex, stage2MissCount;
-let stage2MissedIndexes, stage2RepeatCount, stage2Enabled;
+let ST2_charIndex, ST2_selectedIndex, ST2_missCount;
+let ST2_missedIndexes, ST2_repeatCount, ST2_enabled;
 
 // スイカ配置（M字型）
 const ST2_POSITIONS = [
@@ -28,200 +28,206 @@ const ST2_POSITIONS = [
 // ==============================
 // Stage2 開始
 function startStage2() {
-  // DOM遅延取得
-  const luntu = document.getElementById("luntu");
-  const msgWindow = document.getElementById("messageWindow");
-  const msgImage  = document.getElementById("messageImage");
-  const curtainLeft  = document.getElementById("curtainLeft");
-  const curtainRight = document.getElementById("curtainRight");
-  const intro        = document.getElementById("intro");
 
-  const stage2Watermelons = [
-    document.getElementById("w0"),
-    document.getElementById("w1"),
-    document.getElementById("w2"),
-    document.getElementById("w3"),
-    document.getElementById("w4")
+  // DOM遅延取得（stage2 専用 ID）
+  const ST2_luntu = document.getElementById("luntu");
+  const ST2_msgWindow = document.getElementById("messageWindow");
+  const ST2_msgImage  = document.getElementById("messageImage");
+  const ST2_curtainLeft  = document.getElementById("curtainLeft");
+  const ST2_curtainRight = document.getElementById("curtainRight");
+  const ST2_intro        = document.getElementById("intro");
+
+  // ステージ2専用のスイカ
+  const ST2_watermelons = [
+    document.getElementById("st2_w0"),
+    document.getElementById("st2_w1"),
+    document.getElementById("st2_w2"),
+    document.getElementById("st2_w3"),
+    document.getElementById("st2_w4")
   ];
 
   // ==============================
-  // メッセージ表示関数
-  function showMsg(imgName, onClick = null) {
-    msgImage.src = imgName;
-    msgWindow.style.display = "block";
-    msgWindow.onclick = () => {
-      msgWindow.style.display = "none";
+  // 安全なメッセージ表示
+  function ST2_showMsg(imgName, onClick = null) {
+    ST2_enabled = false; // メッセージ中は操作禁止
+    ST2_msgImage.src = imgName;
+    ST2_msgWindow.style.display = "block";
+
+    ST2_msgWindow.onclick = () => {
+      ST2_msgWindow.style.display = "none";
       if (onClick) onClick();
+      ST2_enabled = true;
     };
   }
 
   // ==============================
-  // スイカ点滅
-  function setFlash(index) {
-    stage2Watermelons.forEach(w => w.classList.remove("flash"));
-    if (index !== null) stage2Watermelons[index].classList.add("flash");
+  function ST2_setFlash(index) {
+    ST2_watermelons.forEach(w => w.classList.remove("flash"));
+    if (index !== null) ST2_watermelons[index].classList.add("flash");
   }
 
   // ==============================
-  // ルントウ移動
-  function moveLuntuTo(target) {
-    const targetCenterX = target.offsetLeft + target.offsetWidth / 2;
-    const lLeft = targetCenterX - luntu.offsetWidth / 2;
-    const lTop  = target.offsetTop - luntu.offsetHeight - 0.2 * luntu.offsetHeight;
-    luntu.style.left = `${lLeft}px`;
-    luntu.style.top  = `${lTop}px`;
+  function ST2_moveLuntuTo(target) {
+    const cx = target.offsetLeft + target.offsetWidth / 2;
+    const lx = cx - ST2_luntu.offsetWidth / 2;
+    const ly = target.offsetTop - ST2_luntu.offsetHeight * 1.2;
+    ST2_luntu.style.left = `${lx}px`;
+    ST2_luntu.style.top  = `${ly}px`;
   }
 
   // ==============================
-  // 攻撃演出
-  function showAttack(duration = 700) {
+  function ST2_showAttack(duration = 700) {
     return new Promise(resolve => {
-      stage2Enabled = false;
-      showMsg(ST2_MSG_ATTACK);
+      ST2_showMsg(ST2_MSG_ATTACK);
       setTimeout(() => {
-        msgWindow.style.display = "none";
-        stage2Enabled = true;
+        ST2_msgWindow.style.display = "none";
         resolve();
       }, duration);
     });
   }
 
   // ==============================
-  // 勝利の舞
-  async function clearDance() {
-    luntu.style.left = "120px";
-    luntu.style.top  = "40px";
+  async function ST2_clearDance() {
+    ST2_luntu.style.left = "120px";
+    ST2_luntu.style.top  = "40px";
 
     for (let set = 0; set < 2; set++) {
-      for (let jump = 0; jump < 2; jump++) {
-        luntu.classList.add("jump");
+      for (let j = 0; j < 2; j++) {
+        ST2_luntu.classList.add("jump");
         await new Promise(r => setTimeout(r, 400));
-        luntu.classList.remove("jump");
+        ST2_luntu.classList.remove("jump");
         await new Promise(r => setTimeout(r, 50));
       }
       await new Promise(r => setTimeout(r, 50));
-      luntu.style.transform = "scaleX(-1)";
+      ST2_luntu.style.transform = "scaleX(-1)";
       await new Promise(r => setTimeout(r, 400));
-      luntu.style.transform = "scaleX(1)";
+      ST2_luntu.style.transform = "scaleX(1)";
       await new Promise(r => setTimeout(r, 300));
     }
 
-    luntu.classList.add("jump");
+    ST2_luntu.classList.add("jump");
     await new Promise(r => setTimeout(r, 400));
-    luntu.classList.remove("jump");
-
-    stage2Enabled = true;
+    ST2_luntu.classList.remove("jump");
   }
 
   // ==============================
-  // 勝利演出
-  async function playHitSequence() {
-    stage2Enabled = false;
-    showMsg(ST2_MSG_HIT1);
+  async function ST2_playHitSequence() {
+    ST2_enabled = false;
+    ST2_showMsg(ST2_MSG_HIT1);
     await new Promise(r => setTimeout(r, 600));
-    showMsg(ST2_MSG_HIT2);
-    await new Promise(r => setTimeout(r, 600));
-    showMsg(ST2_MSG_HIT3);
-    await new Promise(r => setTimeout(r, 600));
-    await clearDance();
-    showMsg(ST2_MSG_CLEAR, () => {
-      resetToOpening(); // script.js 側関数
-      stage2Enabled = false;
-    });
-  }
 
-  // ==============================
-  // ゲームオーバー演出
-  function playGameOver() {
-    stage2Enabled = false;
-    showMsg(ST2_MSG_MISS, () => {
+    ST2_showMsg(ST2_MSG_HIT2);
+    await new Promise(r => setTimeout(r, 600));
+
+    ST2_showMsg(ST2_MSG_HIT3);
+    await new Promise(r => setTimeout(r, 600));
+
+    await ST2_clearDance();
+
+    // クリア
+    ST2_showMsg(ST2_MSG_CLEAR, () => {
+      ST2_enabled = false;
       resetToOpening();
     });
   }
 
   // ==============================
-  // クリック処理
-  function clickHandler(wm, index) {
-    if (!stage2Enabled) return;
+  function ST2_playGameOver() {
+    ST2_enabled = false;
+    ST2_showMsg(ST2_MSG_MISS, () => {
+      resetToOpening();
+    });
+  }
 
-    if (stage2SelectedIndex !== index) {
-      stage2SelectedIndex = index;
-      stage2RepeatCount = 0;
-      setFlash(index);
-      moveLuntuTo(wm);
+  // ==============================
+  function ST2_clickHandler(wm, index) {
+    if (!ST2_enabled) return;
+
+    // 初回選択
+    if (ST2_selectedIndex !== index) {
+      ST2_selectedIndex = index;
+      ST2_repeatCount = 0;
+      ST2_setFlash(index);
+      ST2_moveLuntuTo(wm);
       return;
     }
 
-    stage2RepeatCount++;
-    if (stage2RepeatCount >= 2) return;
+    // 2回目クリックで攻撃
+    ST2_repeatCount++;
+    if (ST2_repeatCount > 1) return;
 
-    showAttack(400).then(() => {
-      if (index === stage2CharIndex) {
-        setFlash(null);
-        stage2SelectedIndex = null;
-        playHitSequence();
+    ST2_showAttack(400).then(() => {
+
+      if (index === ST2_charIndex) {
+        ST2_setFlash(null);
+        ST2_selectedIndex = null;
+        ST2_playHitSequence();
       } else {
-        if (!stage2MissedIndexes.has(index)) {
-          stage2MissedIndexes.add(index);
-          stage2MissCount++;
+        if (!ST2_missedIndexes.has(index)) {
+          ST2_missedIndexes.add(index);
+          ST2_missCount++;
         }
+
         wm.style.display = "none";
-        stage2SelectedIndex = null;
-        setFlash(null);
-        if (stage2MissCount >= 2) playGameOver();
+        ST2_selectedIndex = null;
+        ST2_setFlash(null);
+
+        if (ST2_missCount >= 2) ST2_playGameOver();
       }
     });
   }
 
   // ==============================
-  // Stage2 初期化
-  function initStage2() {
-    stage2Watermelons.forEach((w, i) => {
+  function ST2_initStage2() {
+    ST2_watermelons.forEach((w, i) => {
       w.style.left = ST2_POSITIONS[i].x + "px";
       w.style.top  = ST2_POSITIONS[i].y + "px";
       w.style.display = "block";
       w.classList.remove("flash");
-      w.onclick = () => clickHandler(w, i);
+      w.onclick = () => ST2_clickHandler(w, i);
     });
 
-    stage2CharIndex     = Math.floor(Math.random() * stage2Watermelons.length);
-    stage2SelectedIndex = null;
-    stage2MissCount     = 0;
-    stage2MissedIndexes = new Set();
-    stage2RepeatCount   = 0;
-    stage2Enabled       = false;
+    ST2_charIndex     = Math.floor(Math.random() * ST2_watermelons.length);
+    ST2_selectedIndex = null;
+    ST2_missCount     = 0;
+    ST2_missedIndexes = new Set();
+    ST2_repeatCount   = 0;
 
-    luntu.style.left = "120px";
-    luntu.style.top  = "40px";
-    luntu.style.display = "block";
+    ST2_luntu.style.left = "120px";
+    ST2_luntu.style.top  = "40px";
+    ST2_luntu.style.display = "block";
   }
 
   // ==============================
-  // Stage2 開始演出
-  // カーテン出現（暗転）
-  curtainLeft.style.display  = "block";
-  curtainRight.style.display = "block";
+  // 開始演出
+  ST2_curtainLeft.style.display  = "block";
+  ST2_curtainRight.style.display = "block";
   setTimeout(() => {
-    curtainLeft.classList.add("curtain-show");
-    curtainRight.classList.add("curtain-show");
-  }, 50); // 表示確定のため短遅延
+    ST2_curtainLeft.classList.add("curtain-show");
+    ST2_curtainRight.classList.add("curtain-show");
+  }, 50);
 
-  // next.gif 表示
-  intro.src = "next.gif";
-  intro.style.opacity = 0;
-  intro.style.display = "block";
-  setTimeout(() => { intro.style.transition = "opacity 0.6s"; intro.style.opacity = 1; }, 100);
-  setTimeout(() => { intro.style.transition = "opacity 0.6s"; intro.style.opacity = 0; }, 7100); // 7秒表示
-
-  // フェードアウト完了後にカーテン開き & Stage2初期化
+  ST2_intro.src = "next.gif";
+  ST2_intro.style.opacity = 0;
+  ST2_intro.style.display = "block";
   setTimeout(() => {
-    intro.style.display = "none";
-    curtainLeft.classList.remove("curtain-show");
-    curtainRight.classList.remove("curtain-show");
-    curtainLeft.classList.add("curtain-open-left");
-    curtainRight.classList.add("curtain-open-right");
+    ST2_intro.style.transition = "opacity 0.6s";
+    ST2_intro.style.opacity = 1;
+  }, 100);
 
-    initStage2();
-    stage2Enabled = true;
+  setTimeout(() => {
+    ST2_intro.style.opacity = 0;
+  }, 7100);
+
+  setTimeout(() => {
+    ST2_intro.style.display = "none";
+    ST2_curtainLeft.classList.remove("curtain-show");
+    ST2_curtainRight.classList.remove("curtain-show");
+    ST2_curtainLeft.classList.add("curtain-open-left");
+    ST2_curtainRight.classList.add("curtain-open-right");
+
+    ST2_initStage2();
+    ST2_enabled = true;
   }, 7800);
 }
+
