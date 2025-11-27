@@ -1,9 +1,10 @@
 // ============================================
-// Stage2 完全独立版：stage2.js
+// Stage2 完全独立版：DOM生成方式
 // ============================================
 
 // ==============================
-// 定数（script.js と衝突しない名前）
+// 定数
+// ==============================
 const ST2_MSG_ATTACK = "attack.png";
 const ST2_MSG_HIT1   = "hit.png";
 const ST2_MSG_HIT2   = "hit2.png";
@@ -11,13 +12,8 @@ const ST2_MSG_HIT3   = "hit3.png";
 const ST2_MSG_CLEAR  = "clear.png";
 const ST2_MSG_MISS   = "miss.png";
 
-// ==============================
-// ゲーム管理変数（stage2専用）
-let ST2_charIndex, ST2_selectedIndex, ST2_missCount;
-let ST2_missedIndexes, ST2_repeatCount, ST2_enabled;
-
-// スイカ配置（M字型）
-const ST2_POSITIONS = [
+// スイカ座標
+const ST2_POS = [
   { x: 80,  y: 110 },
   { x: 240, y: 110 },
   { x: 40,  y: 200 },
@@ -26,208 +22,233 @@ const ST2_POSITIONS = [
 ];
 
 // ==============================
+// Stage2 変数
+// ==============================
+let st2_wms = [];             // 生成したスイカDOM
+let st2CharIndex;
+let st2SelectedIndex;
+let st2MissCount;
+let st2Repeat;
+let st2Missed;
+let stage2Enabled = false;
+
+
+// ==============================
 // Stage2 開始
+// ==============================
 function startStage2() {
 
-  // DOM遅延取得（stage2 専用 ID）
-  const ST2_luntu = document.getElementById("luntu");
-  const ST2_msgWindow = document.getElementById("messageWindow");
-  const ST2_msgImage  = document.getElementById("messageImage");
-  const ST2_curtainLeft  = document.getElementById("curtainLeft");
-  const ST2_curtainRight = document.getElementById("curtainRight");
-  const ST2_intro        = document.getElementById("intro");
+  // DOM
+  const luntu       = document.getElementById("luntu");
+  const msgWindow   = document.getElementById("messageWindow");
+  const msgImage    = document.getElementById("messageImage");
+  const curtainLeft = document.getElementById("curtainLeft");
+  const curtainRight= document.getElementById("curtainRight");
+  const intro       = document.getElementById("intro");
+  const gameArea    = document.getElementById("game");
 
-  // ステージ2専用のスイカ
-  const ST2_watermelons = [
-    document.getElementById("st2_w0"),
-    document.getElementById("st2_w1"),
-    document.getElementById("st2_w2"),
-    document.getElementById("st2_w3"),
-    document.getElementById("st2_w4")
-  ];
+  // ----------------------------------------------------
+  // Stage1 のスイカが混ざるのを防ぐため、Stage2用スイカを自前生成
+  // ----------------------------------------------------
+  function createStage2Watermelons() {
+    removeStage2Watermelons();
+
+    st2_wms = ST2_POS.map((p, i) => {
+      const w = document.createElement("img");
+      w.src = "watermelon.png";
+      w.className = "watermelon";
+      w.id = `st2_w${i}`;
+      w.style.left = p.x + "px";
+      w.style.top  = p.y + "px";
+      gameArea.appendChild(w);
+      return w;
+    });
+  }
+
+  // 削除（reset時にも使用）
+  function removeStage2Watermelons() {
+    st2_wms.forEach(w => w.remove());
+    st2_wms = [];
+  }
 
   // ==============================
-  // 安全なメッセージ表示
-  function ST2_showMsg(imgName, onClick = null) {
-    ST2_enabled = false; // メッセージ中は操作禁止
-    ST2_msgImage.src = imgName;
-    ST2_msgWindow.style.display = "block";
-
-    ST2_msgWindow.onclick = () => {
-      ST2_msgWindow.style.display = "none";
+  // メッセージ
+  // ==============================
+  function st2_showMsg(img, onClick = null) {
+    msgImage.src = img;
+    msgWindow.style.display = "block";
+    msgWindow.onclick = () => {
+      msgWindow.style.display = "none";
       if (onClick) onClick();
-      ST2_enabled = true;
     };
   }
 
   // ==============================
-  function ST2_setFlash(index) {
-    ST2_watermelons.forEach(w => w.classList.remove("flash"));
-    if (index !== null) ST2_watermelons[index].classList.add("flash");
+  // スイカ点滅
+  // ==============================
+  function st2_flash(idx) {
+    st2_wms.forEach(w => w.classList.remove("flash"));
+    if (idx !== null) st2_wms[idx].classList.add("flash");
   }
 
   // ==============================
-  function ST2_moveLuntuTo(target) {
-    const cx = target.offsetLeft + target.offsetWidth / 2;
-    const lx = cx - ST2_luntu.offsetWidth / 2;
-    const ly = target.offsetTop - ST2_luntu.offsetHeight * 1.2;
-    ST2_luntu.style.left = `${lx}px`;
-    ST2_luntu.style.top  = `${ly}px`;
+  // ルントウ移動
+  // ==============================
+  function st2_moveLuntu(target) {
+    const x = target.offsetLeft + target.offsetWidth / 2;
+    const y = target.offsetTop  - target.offsetHeight * 1.2;
+    luntu.style.left = `${x - luntu.offsetWidth/2}px`;
+    luntu.style.top  = `${y}px`;
   }
 
   // ==============================
-  function ST2_showAttack(duration = 700) {
+  // 攻撃演出
+  // ==============================
+  function st2_attack() {
     return new Promise(resolve => {
-      ST2_showMsg(ST2_MSG_ATTACK);
+      stage2Enabled = false;
+      st2_showMsg(ST2_MSG_ATTACK);
       setTimeout(() => {
-        ST2_msgWindow.style.display = "none";
+        msgWindow.style.display = "none";
+        stage2Enabled = true;
         resolve();
-      }, duration);
+      }, 500);
     });
   }
 
   // ==============================
-  async function ST2_clearDance() {
-    ST2_luntu.style.left = "120px";
-    ST2_luntu.style.top  = "40px";
-
-    for (let set = 0; set < 2; set++) {
+  // 勝利の舞
+  // ==============================
+  async function st2_clearDance() {
+    for (let i = 0; i < 2; i++) {
       for (let j = 0; j < 2; j++) {
-        ST2_luntu.classList.add("jump");
-        await new Promise(r => setTimeout(r, 400));
-        ST2_luntu.classList.remove("jump");
-        await new Promise(r => setTimeout(r, 50));
+        luntu.classList.add("jump");
+        await new Promise(r=>setTimeout(r,400));
+        luntu.classList.remove("jump");
+        await new Promise(r=>setTimeout(r,80));
       }
-      await new Promise(r => setTimeout(r, 50));
-      ST2_luntu.style.transform = "scaleX(-1)";
-      await new Promise(r => setTimeout(r, 400));
-      ST2_luntu.style.transform = "scaleX(1)";
-      await new Promise(r => setTimeout(r, 300));
+      luntu.style.transform="scaleX(-1)";
+      await new Promise(r=>setTimeout(r,300));
+      luntu.style.transform="scaleX(1)";
+      await new Promise(r=>setTimeout(r,300));
     }
-
-    ST2_luntu.classList.add("jump");
-    await new Promise(r => setTimeout(r, 400));
-    ST2_luntu.classList.remove("jump");
   }
 
   // ==============================
-  async function ST2_playHitSequence() {
-    ST2_enabled = false;
-    ST2_showMsg(ST2_MSG_HIT1);
-    await new Promise(r => setTimeout(r, 600));
+  // 勝利
+  // ==============================
+  async function st2_win() {
+    stage2Enabled = false;
+    st2_showMsg(ST2_MSG_HIT1);
+    await new Promise(r=>setTimeout(r,600));
+    st2_showMsg(ST2_MSG_HIT2);
+    await new Promise(r=>setTimeout(r,600));
+    st2_showMsg(ST2_MSG_HIT3);
+    await new Promise(r=>setTimeout(r,600));
 
-    ST2_showMsg(ST2_MSG_HIT2);
-    await new Promise(r => setTimeout(r, 600));
+    await st2_clearDance();
 
-    ST2_showMsg(ST2_MSG_HIT3);
-    await new Promise(r => setTimeout(r, 600));
+    st2_showMsg(ST2_MSG_CLEAR, () => {
+      removeStage2Watermelons();
+      resetToOpening();  // ← script.js の関数
+    });
+  }
 
-    await ST2_clearDance();
-
-    // クリア
-    ST2_showMsg(ST2_MSG_CLEAR, () => {
-      ST2_enabled = false;
+  // ==============================
+  // ゲームオーバー
+  // ==============================
+  function st2_gameover() {
+    stage2Enabled = false;
+    st2_showMsg(ST2_MSG_MISS, () => {
+      removeStage2Watermelons();
       resetToOpening();
     });
   }
 
   // ==============================
-  function ST2_playGameOver() {
-    ST2_enabled = false;
-    ST2_showMsg(ST2_MSG_MISS, () => {
-      resetToOpening();
-    });
-  }
-
+  // クリック
   // ==============================
-  function ST2_clickHandler(wm, index) {
-    if (!ST2_enabled) return;
+  function st2_click(w, idx) {
+    if (!stage2Enabled) return;
 
-    // 初回選択
-    if (ST2_selectedIndex !== index) {
-      ST2_selectedIndex = index;
-      ST2_repeatCount = 0;
-      ST2_setFlash(index);
-      ST2_moveLuntuTo(wm);
+    // 1回目：選択
+    if (st2SelectedIndex !== idx) {
+      st2SelectedIndex = idx;
+      st2Repeat = 0;
+      st2_flash(idx);
+      st2_moveLuntu(w);
       return;
     }
 
-    // 2回目クリックで攻撃
-    ST2_repeatCount++;
-    if (ST2_repeatCount > 1) return;
+    // 2回目：攻撃
+    st2Repeat++;
+    if (st2Repeat >= 2) return;
 
-    ST2_showAttack(400).then(() => {
-
-      if (index === ST2_charIndex) {
-        ST2_setFlash(null);
-        ST2_selectedIndex = null;
-        ST2_playHitSequence();
+    st2_attack().then(() => {
+      if (idx === st2CharIndex) {
+        st2_flash(null);
+        st2SelectedIndex = null;
+        st2_win();
       } else {
-        if (!ST2_missedIndexes.has(index)) {
-          ST2_missedIndexes.add(index);
-          ST2_missCount++;
+        if (!st2Missed.has(idx)) {
+          st2Missed.add(idx);
+          st2MissCount++;
         }
-
-        wm.style.display = "none";
-        ST2_selectedIndex = null;
-        ST2_setFlash(null);
-
-        if (ST2_missCount >= 2) ST2_playGameOver();
+        w.style.display = "none";
+        st2_flash(null);
+        st2SelectedIndex = null;
+        if (st2MissCount >= 2) st2_gameover();
       }
     });
   }
 
   // ==============================
-  function ST2_initStage2() {
-    ST2_watermelons.forEach((w, i) => {
-      w.style.left = ST2_POSITIONS[i].x + "px";
-      w.style.top  = ST2_POSITIONS[i].y + "px";
+  // Stage2 初期化
+  // ==============================
+  function st2_init() {
+    createStage2Watermelons();
+
+    st2_wms.forEach((w, i) => {
+      w.onclick = () => st2_click(w, i);
       w.style.display = "block";
       w.classList.remove("flash");
-      w.onclick = () => ST2_clickHandler(w, i);
     });
 
-    ST2_charIndex     = Math.floor(Math.random() * ST2_watermelons.length);
-    ST2_selectedIndex = null;
-    ST2_missCount     = 0;
-    ST2_missedIndexes = new Set();
-    ST2_repeatCount   = 0;
+    st2CharIndex = Math.floor(Math.random() * 5);
+    st2SelectedIndex = null;
+    st2MissCount = 0;
+    st2Repeat = 0;
+    st2Missed = new Set();
 
-    ST2_luntu.style.left = "120px";
-    ST2_luntu.style.top  = "40px";
-    ST2_luntu.style.display = "block";
+    luntu.style.display = "block";
+    luntu.style.left = "120px";
+    luntu.style.top  = "40px";
+
+    stage2Enabled = true;
   }
 
   // ==============================
-  // 開始演出
-  ST2_curtainLeft.style.display  = "block";
-  ST2_curtainRight.style.display = "block";
-  setTimeout(() => {
-    ST2_curtainLeft.classList.add("curtain-show");
-    ST2_curtainRight.classList.add("curtain-show");
-  }, 50);
+  // 演出（next→カーテン）
+  // ==============================
+  intro.src = "next.gif";
+  intro.style.display = "block";
+  intro.style.opacity = 1;
 
-  ST2_intro.src = "next.gif";
-  ST2_intro.style.opacity = 0;
-  ST2_intro.style.display = "block";
-  setTimeout(() => {
-    ST2_intro.style.transition = "opacity 0.6s";
-    ST2_intro.style.opacity = 1;
-  }, 100);
+  setTimeout(()=>{ intro.style.opacity = 0; }, 6500);
+  setTimeout(()=>{ intro.style.display = "none"; }, 7200);
 
-  setTimeout(() => {
-    ST2_intro.style.opacity = 0;
-  }, 7100);
+  // カーテン（妥協案としてそのまま）
+  curtainLeft.style.display  = "block";
+  curtainRight.style.display = "block";
+  curtainLeft.classList.add("curtain-show");
+  curtainRight.classList.add("curtain-show");
 
-  setTimeout(() => {
-    ST2_intro.style.display = "none";
-    ST2_curtainLeft.classList.remove("curtain-show");
-    ST2_curtainRight.classList.remove("curtain-show");
-    ST2_curtainLeft.classList.add("curtain-open-left");
-    ST2_curtainRight.classList.add("curtain-open-right");
-
-    ST2_initStage2();
-    ST2_enabled = true;
+  // カーテン開 → ゲーム開始
+  setTimeout(()=>{
+    curtainLeft.classList.remove("curtain-show");
+    curtainRight.classList.remove("curtain-show");
+    curtainLeft.classList.add("curtain-open-left");
+    curtainRight.classList.add("curtain-open-right");
+    st2_init();
   }, 7800);
 }
-
