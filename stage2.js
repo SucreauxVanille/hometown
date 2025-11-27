@@ -1,16 +1,17 @@
 // ============================================
-// Stage2 完全独立版：DOM生成方式
+// Stage2 完全独立版：DOM生成方式＋リファクタリング済
 // ============================================
 
 // ==============================
 // 定数
 // ==============================
-const ST2_MSG_ATTACK = "attack.png";
-const ST2_MSG_HIT1   = "hit.png";
-const ST2_MSG_HIT2   = "hit2.png";
-const ST2_MSG_HIT3   = "hit3.png";
-const ST2_MSG_CLEAR  = "clear.png";
-const ST2_MSG_MISS   = "miss.png";
+const ST2_MSG_ATTACK   = "attack.png";
+const ST2_MSG_HIT1     = "hit.png";
+const ST2_MSG_HIT2     = "hit2.png";
+const ST2_MSG_HIT3     = "hit3.png";
+const ST2_MSG_CLEAR    = "clear.png";
+const ST2_MSG_MISS     = "miss.png";
+const ST2_MSG_GAMEOVER = "gameover.png";
 
 // スイカ座標
 const ST2_POS = [
@@ -24,7 +25,7 @@ const ST2_POS = [
 // ==============================
 // Stage2 変数
 // ==============================
-let st2_wms = [];             // 生成したスイカDOM
+let st2_wms = [];           
 let st2CharIndex;
 let st2SelectedIndex;
 let st2MissCount;
@@ -32,13 +33,11 @@ let st2Repeat;
 let st2Missed;
 let stage2Enabled = false;
 
-
 // ==============================
 // Stage2 開始
 // ==============================
 function startStage2() {
 
-  // DOM
   const luntu       = document.getElementById("luntu");
   const msgWindow   = document.getElementById("messageWindow");
   const msgImage    = document.getElementById("messageImage");
@@ -48,11 +47,10 @@ function startStage2() {
   const gameArea    = document.getElementById("game");
 
   // ----------------------------------------------------
-  // Stage1 のスイカが混ざるのを防ぐため、Stage2用スイカを自前生成
+  // Stage2用スイカ生成／削除
   // ----------------------------------------------------
   function createStage2Watermelons() {
     removeStage2Watermelons();
-
     st2_wms = ST2_POS.map((p, i) => {
       const w = document.createElement("img");
       w.src = "watermelon.png";
@@ -65,20 +63,21 @@ function startStage2() {
     });
   }
 
-  // 削除（reset時にも使用）
   function removeStage2Watermelons() {
     st2_wms.forEach(w => w.remove());
     st2_wms = [];
   }
 
   // ==============================
-  // メッセージ
+  // メッセージ表示
   // ==============================
   function st2_showMsg(img, onClick = null) {
+    stage2Enabled = false;
     msgImage.src = img;
     msgWindow.style.display = "block";
     msgWindow.onclick = () => {
       msgWindow.style.display = "none";
+      stage2Enabled = true;
       if (onClick) onClick();
     };
   }
@@ -107,12 +106,9 @@ function startStage2() {
   function st2_attack() {
     return new Promise(resolve => {
       stage2Enabled = false;
-      st2_showMsg(ST2_MSG_ATTACK);
-      setTimeout(() => {
-        msgWindow.style.display = "none";
-        stage2Enabled = true;
+      st2_showMsg(ST2_MSG_ATTACK, () => {
         resolve();
-      }, 500);
+      });
     });
   }
 
@@ -135,7 +131,7 @@ function startStage2() {
   }
 
   // ==============================
-  // 勝利
+  // 勝利演出
   // ==============================
   async function st2_win() {
     stage2Enabled = false;
@@ -150,23 +146,25 @@ function startStage2() {
 
     st2_showMsg(ST2_MSG_CLEAR, () => {
       removeStage2Watermelons();
-      resetToOpening();  // ← script.js の関数
-    });
-  }
-
-  // ==============================
-  // ゲームオーバー
-  // ==============================
-  function st2_gameover() {
-    stage2Enabled = false;
-    st2_showMsg(ST2_MSG_MISS, () => {
-      removeStage2Watermelons();
       resetToOpening();
     });
   }
 
   // ==============================
-  // クリック
+  // ゲームオーバー演出
+  // ==============================
+  function st2_gameover() {
+    stage2Enabled = false;
+    st2_showMsg(ST2_MSG_MISS, () => {
+      st2_showMsg(ST2_MSG_GAMEOVER, () => {
+        removeStage2Watermelons();
+        resetToOpening();
+      });
+    });
+  }
+
+  // ==============================
+  // クリック処理
   // ==============================
   function st2_click(w, idx) {
     if (!stage2Enabled) return;
@@ -197,32 +195,36 @@ function startStage2() {
         w.style.display = "none";
         st2_flash(null);
         st2SelectedIndex = null;
-        if (st2MissCount >= 2) st2_gameover();
+
+        if (st2MissCount >= 2) {
+          st2_gameover();
+        } else {
+          st2_showMsg(ST2_MSG_MISS);
+        }
       }
     });
   }
 
   // ==============================
-  // Stage2 初期化
+  // 初期化
   // ==============================
   function st2_init() {
     createStage2Watermelons();
-
     st2_wms.forEach((w, i) => {
       w.onclick = () => st2_click(w, i);
-      w.style.display = "block";
       w.classList.remove("flash");
+      w.style.display = "block";
     });
 
-    st2CharIndex = Math.floor(Math.random() * 5);
+    st2CharIndex     = Math.floor(Math.random()*5);
     st2SelectedIndex = null;
-    st2MissCount = 0;
-    st2Repeat = 0;
-    st2Missed = new Set();
+    st2MissCount     = 0;
+    st2Repeat        = 0;
+    st2Missed        = new Set();
 
     luntu.style.display = "block";
-    luntu.style.left = "120px";
-    luntu.style.top  = "40px";
+    luntu.style.left    = "120px";
+    luntu.style.top     = "40px";
 
     stage2Enabled = true;
   }
@@ -237,13 +239,11 @@ function startStage2() {
   setTimeout(()=>{ intro.style.opacity = 0; }, 6500);
   setTimeout(()=>{ intro.style.display = "none"; }, 7200);
 
-  // カーテン（妥協案としてそのまま）
   curtainLeft.style.display  = "block";
   curtainRight.style.display = "block";
   curtainLeft.classList.add("curtain-show");
   curtainRight.classList.add("curtain-show");
 
-  // カーテン開 → ゲーム開始
   setTimeout(()=>{
     curtainLeft.classList.remove("curtain-show");
     curtainRight.classList.remove("curtain-show");
@@ -252,3 +252,4 @@ function startStage2() {
     st2_init();
   }, 7800);
 }
+
