@@ -112,6 +112,64 @@ function startStage2() {
     });
   }
 
+    // ==============================
+  // クリック処理
+  // ==============================
+function st2_click(w, idx) {
+  if (!stage2Enabled) return;
+
+  // 1回目クリック：選択＋移動＋点滅
+  if (st2SelectedIndex !== idx) {
+    st2SelectedIndex = idx;
+    st2Repeat = 0;
+    st2_flash(idx);
+    st2_moveLuntu(w);
+    return;
+  }
+
+  // 2回目クリック：攻撃
+  st2Repeat++;
+  if (st2Repeat >= 2) return;
+
+  stage2Enabled = false;  // クリックロック
+
+  // 攻撃メッセージ表示 + ルントウジャンプ
+  st2_showMsg(ST2_MSG_ATTACK);
+  luntu.classList.add("jump");
+  setTimeout(() => luntu.classList.remove("jump"), 300);
+
+  // メッセージを短時間表示
+  setTimeout(() => {
+    msgWindow.style.display = "none";
+
+    if (idx === st2CharIndex) {
+      // 正解
+      st2_flash(null);
+      st2SelectedIndex = null;
+      st2_win();
+    } else {
+      // ミス処理
+      if (!st2Missed.has(idx)) {
+        st2Missed.add(idx);
+        st2MissCount++;
+      }
+      w.style.display = "none";
+      st2_flash(null);
+      st2SelectedIndex = null;
+
+      if (st2MissCount >= 2) {
+        // ゲームオーバー
+        st2_gameover();
+      } else {
+        // 単なるミス
+        st2_showMsg(ST2_MSG_MISS);
+      }
+    }
+
+    stage2Enabled = true;  // クリック再有効化
+  }, 400);  // 攻撃メッセージ表示時間
+}
+
   // ==============================
   // 勝利の舞
   // ==============================
@@ -160,48 +218,6 @@ function startStage2() {
         removeStage2Watermelons();
         resetToOpening();
       });
-    });
-  }
-
-  // ==============================
-  // クリック処理
-  // ==============================
-  function st2_click(w, idx) {
-    if (!stage2Enabled) return;
-
-    // 1回目：選択
-    if (st2SelectedIndex !== idx) {
-      st2SelectedIndex = idx;
-      st2Repeat = 0;
-      st2_flash(idx);
-      st2_moveLuntu(w);
-      return;
-    }
-
-    // 2回目：攻撃
-    st2Repeat++;
-    if (st2Repeat >= 2) return;
-
-    st2_attack().then(() => {
-      if (idx === st2CharIndex) {
-        st2_flash(null);
-        st2SelectedIndex = null;
-        st2_win();
-      } else {
-        if (!st2Missed.has(idx)) {
-          st2Missed.add(idx);
-          st2MissCount++;
-        }
-        w.style.display = "none";
-        st2_flash(null);
-        st2SelectedIndex = null;
-
-        if (st2MissCount >= 2) {
-          st2_gameover();
-        } else {
-          st2_showMsg(ST2_MSG_MISS);
-        }
-      }
     });
   }
 
