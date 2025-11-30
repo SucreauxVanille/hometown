@@ -1,10 +1,4 @@
-// ============================================
-// Stage2 完全独立版：DOM生成方式＋リファクタリング済
-// ============================================
-
-// ==============================
 // 定数
-// ==============================
 const ST2_MSG_ATTACK   = "attack.png";
 const ST2_MSG_HIT1     = "hit.png";
 const ST2_MSG_HIT2     = "hit2.png";
@@ -22,9 +16,7 @@ const ST2_POS = [
   { x: 280, y: 200 }
 ];
 
-// ==============================
 // Stage2 変数
-// ==============================
 let st2_wms = [];           
 let st2CharIndex;
 let st2SelectedIndex;
@@ -33,9 +25,7 @@ let st2Repeat;
 let st2Missed;
 let stage2Enabled = false;
 
-// ==============================
 // Stage2 開始
-// ==============================
 function startStage2() {
 
   const luntu       = document.getElementById("luntu");
@@ -46,9 +36,7 @@ function startStage2() {
   const intro       = document.getElementById("intro");
   const gameArea    = document.getElementById("game");
 
-  // ----------------------------------------------------
   // Stage2用スイカ生成／削除
-  // ----------------------------------------------------
   function createStage2Watermelons() {
     removeStage2Watermelons();
     st2_wms = ST2_POS.map((p, i) => {
@@ -68,9 +56,7 @@ function startStage2() {
     st2_wms = [];
   }
 
-  // ==============================
   // メッセージ表示
-  // ==============================
   function st2_showMsg(img, onClick = null) {
     stage2Enabled = false;
     msgImage.src = img;
@@ -82,17 +68,13 @@ function startStage2() {
     };
   }
 
-  // ==============================
   // スイカ点滅
-  // ==============================
   function st2_flash(idx) {
     st2_wms.forEach(w => w.classList.remove("flash"));
     if (idx !== null) st2_wms[idx].classList.add("flash");
   }
 
-  // ==============================
   // ルントウ移動
-  // ==============================
   function st2_moveLuntu(target) {
     const x = target.offsetLeft + target.offsetWidth / 2;
     const y = target.offsetTop  - target.offsetHeight * 1.2;
@@ -100,9 +82,7 @@ function startStage2() {
     luntu.style.top  = `${y}px`;
   }
 
-  // ==============================
   // 攻撃演出
-  // ==============================
   function st2_attack() {
     return new Promise(resolve => {
       stage2Enabled = false;
@@ -112,9 +92,7 @@ function startStage2() {
     });
   }
 
-    // ==============================
   // クリック処理
-  // ==============================
 function st2_click(w, idx) {
   if (!stage2Enabled) return;
 
@@ -143,12 +121,10 @@ function st2_click(w, idx) {
     msgWindow.style.display = "none";
 
     if (idx === st2CharIndex) {
-      // 正解
       st2_flash(null);
       st2SelectedIndex = null;
       st2_win();
     } else {
-      // ミス処理
       if (!st2Missed.has(idx)) {
         st2Missed.add(idx);
         st2MissCount++;
@@ -164,18 +140,14 @@ function st2_click(w, idx) {
       st2_gameover();
     }, 1500); // 1.5秒後にゲームオーバー
   } else {
-    // 単なるミス
     st2_showMsg(ST2_MSG_MISS);
   }
     }
-
     stage2Enabled = true;  // クリック再有効化
   }, 400);  // 攻撃メッセージ表示時間
 }
 
-  // ==============================
   // 勝利の舞
-  // ==============================
   async function st2_clearDance() {
     for (let i = 0; i < 2; i++) {
       for (let j = 0; j < 2; j++) {
@@ -191,9 +163,7 @@ function st2_click(w, idx) {
     }
   }
 
-  // ==============================
   // 勝利演出
-  // ==============================
   async function st2_win() {
     stage2Enabled = false;
     st2_showMsg(ST2_MSG_HIT1);
@@ -211,13 +181,9 @@ function st2_click(w, idx) {
     });
   }
 
-// ==============================
 // Stage2 ゲームオーバー演出
-// ==============================
 async function st2_gameover() {
   stage2Enabled = false;
-
-  // スイカを削除
   removeStage2Watermelons();
 
   // ミスメッセージ表示（任意で短時間固定表示）
@@ -289,10 +255,7 @@ async function st2_gameover() {
   };
 }
 
-
-  // ==============================
   // 初期化
-  // ==============================
   function st2_init() {
     createStage2Watermelons();
     st2_wms.forEach((w, i) => {
@@ -314,9 +277,7 @@ async function st2_gameover() {
     stage2Enabled = true;
   }
 
-  // ==============================
   // 演出（next→カーテン）
-  // ==============================
   intro.src = "next.gif";
   intro.style.display = "block";
   intro.style.opacity = 1;
@@ -337,4 +298,3 @@ async function st2_gameover() {
     st2_init();
   }, 7800);
 }
-
