@@ -135,23 +135,25 @@ function st2_click(w, idx) {
       st2SelectedIndex = null;
 
       // ★ 2回目ミス判定 → gameover.js に委譲
-      if (st2MissCount >= 2) {
-        // Stage2.js 側のクリックイベントを解除
-        msgWindow.onclick = null;
+if (st2MissCount >= 2) {
+    // Stage2.js 側のクリックイベントを解除
+    msgWindow.onclick = null;
 
-        // gameover.js の showGameOver を呼ぶ
-import('./gameover.js').then(module => {
-    module.showGameOver(
-        luntu,
-        msgWindow,
-        msgImage,
-        resetToOpening
-    );
-});
+    // Stage2専用スイカ削除
+    removeStage2Watermelons();
 
+    // gameover.js の showGameOver を呼ぶ
+    import('./gameover.js').then(module => {
+        module.showGameOver(
+            luntu,
+            msgWindow,
+            msgImage,
+            resetToOpening
+        );
+    });
 
-        return; // ここで処理を止める
-      } else {
+    return; // ここで処理を止める
+} else {
         // 1回目ミスは Stage2.js 側で miss.png 表示
         st2_showMsg(ST2_MSG_MISS);
       }
