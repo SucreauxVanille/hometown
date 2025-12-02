@@ -1,4 +1,5 @@
 // gameover.js
+export async function showGameOver(luntu, deku, msgWindow, msgImage, resetCallback) {
 
 /**
  * 共通ゲームオーバー演出
