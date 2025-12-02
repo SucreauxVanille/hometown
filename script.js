@@ -76,6 +76,7 @@ function initGame() {
     gameEnabled = true;
   });
 }
+window.initGame = initGame;
 
 // -----------------------------
 // ルントウ移動：スイカ中央＋y位置調整
