@@ -92,60 +92,69 @@ function startStage2() {
     });
   }
 
-  // クリック処理
-  function st2_click(w, idx) {
-    if (!stage2Enabled) return;
+// クリック処理
+function st2_click(w, idx) {
+  if (!stage2Enabled) return;
 
-    // 1回目クリック：選択＋移動＋点滅
-    if (st2SelectedIndex !== idx) {
-      st2SelectedIndex = idx;
-      st2Repeat = 0;
-      st2_flash(idx);
-      st2_moveLuntu(w);
-      return;
+  // 1回目クリック：選択＋移動＋点滅
+  if (st2SelectedIndex !== idx) {
+    st2SelectedIndex = idx;
+    st2Repeat = 0;
+    st2_flash(idx);
+    st2_moveLuntu(w);
+    return;
+  }
+
+  // 2回目クリック：攻撃
+  st2Repeat++;
+  if (st2Repeat >= 2) return;
+
+  stage2Enabled = false;  // クリックロック
+
+  // 攻撃メッセージ表示 + ルントウジャンプ
+  st2_showMsg(ST2_MSG_ATTACK);
+  luntu.classList.add("jump");
+  setTimeout(() => luntu.classList.remove("jump"), 300);
+
+  // メッセージを短時間表示
+  setTimeout(() => {
+    msgWindow.style.display = "none";
+
+    if (idx === st2CharIndex) {
+      // 勝利処理
+      st2_flash(null);
+      st2SelectedIndex = null;
+      st2_win();
+    } else {
+      if (!st2Missed.has(idx)) {
+        st2Missed.add(idx);
+        st2MissCount++;
+      }
+      w.style.display = "none";
+      st2_flash(null);
+      st2SelectedIndex = null;
+
+      // ★ 2回目ミス判定 → gameover.js に委譲
+      if (st2MissCount >= 2) {
+        // Stage2.js 側のクリックイベントを解除
+        msgWindow.onclick = null;
+
+        // gameover.js の showGameOver を呼ぶ
+        import('./gameover.js').then(module => {
+          module.showGameOver(resetToOpening);
+        });
+
+        return; // ここで処理を止める
+      } else {
+        // 1回目ミスは Stage2.js 側で miss.png 表示
+        st2_showMsg(ST2_MSG_MISS);
+      }
     }
 
-    // 2回目クリック：攻撃
-    st2Repeat++;
-    if (st2Repeat >= 2) return;
+    stage2Enabled = true;  // クリック再有効化（1回目ミス時のみ）
+  }, 400);  // 攻撃メッセージ表示時間
+}
 
-    stage2Enabled = false;  // クリックロック
-
-    // 攻撃メッセージ表示 + ルントウジャンプ
-    st2_showMsg(ST2_MSG_ATTACK);
-    luntu.classList.add("jump");
-    setTimeout(() => luntu.classList.remove("jump"), 300);
-
-    // メッセージを短時間表示
-    setTimeout(() => {
-      msgWindow.style.display = "none";
-
-      if (idx === st2CharIndex) {
-        st2_flash(null);
-        st2SelectedIndex = null;
-        st2_win();
-      } else {
-        if (!st2Missed.has(idx)) {
-          st2Missed.add(idx);
-          st2MissCount++;
-        }
-        w.style.display = "none";
-        st2_flash(null);
-        st2SelectedIndex = null;
-
-        if (st2MissCount >= 2) {
-          // 2回目ミスは即 gameover.js に移行
-          import('./gameover.js').then(module => {
-            module.showGameOver(resetToOpening);
-          });
-          return;
-        } else {
-          st2_showMsg(ST2_MSG_MISS);
-        }
-      }
-      stage2Enabled = true;  // クリック再有効化
-    }, 400);
-  }
 
   // 勝利の舞
   async function st2_clearDance() {
