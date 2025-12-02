@@ -1,16 +1,15 @@
 // gameover.js
-export async function showGameOver(luntu, deku, msgWindow, msgImage, resetCallback) {
-
 /**
  * 共通ゲームオーバー演出
  * @param {HTMLElement} luntu - ルントウ DOM
- * @param {HTMLElement} deku - デク DOM
  * @param {HTMLElement} msgWindow - メッセージウィンドウ DOM
  * @param {HTMLElement} msgImage - メッセージ画像 DOM
  * @param {Function} resetCallback - ステージ固有オブジェクトリセット & オープニング移行
  */
-async function showGameOver(luntu, deku, msgWindow, msgImage, resetCallback) {
+export async function showGameOver(luntu, msgWindow, msgImage, resetCallback) {
 
+    // deku は自前で取得して扱う
+    const deku = document.getElementById("deku");
     // クリック無効化
     let stageEnabled = false;
     stageEnabled = false;
