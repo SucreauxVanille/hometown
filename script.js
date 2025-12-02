@@ -122,7 +122,8 @@ async function playHitSequence() {
   // -------------------------
   watermelons.forEach(w => w.style.display = "none");
   luntu.style.display = "none";
-
+  msgWindow.style.display = "none";
+  
   // -------------------------
   // カーテン出現（暗転）
   // -------------------------
