@@ -1,3 +1,4 @@
+// Stage2.js (gameover.js に委譲版)
 // 定数
 const ST2_MSG_ATTACK   = "attack.png";
 const ST2_MSG_HIT1     = "hit.png";
@@ -5,7 +6,6 @@ const ST2_MSG_HIT2     = "hit2.png";
 const ST2_MSG_HIT3     = "hit3.png";
 const ST2_MSG_CLEAR    = "clear.png";
 const ST2_MSG_MISS     = "miss.png";
-const ST2_MSG_GAMEOVER = "gameover.png";
 
 // スイカ座標
 const ST2_POS = [
@@ -93,59 +93,59 @@ function startStage2() {
   }
 
   // クリック処理
-function st2_click(w, idx) {
-  if (!stage2Enabled) return;
+  function st2_click(w, idx) {
+    if (!stage2Enabled) return;
 
-  // 1回目クリック：選択＋移動＋点滅
-  if (st2SelectedIndex !== idx) {
-    st2SelectedIndex = idx;
-    st2Repeat = 0;
-    st2_flash(idx);
-    st2_moveLuntu(w);
-    return;
-  }
-
-  // 2回目クリック：攻撃
-  st2Repeat++;
-  if (st2Repeat >= 2) return;
-
-  stage2Enabled = false;  // クリックロック
-
-  // 攻撃メッセージ表示 + ルントウジャンプ
-  st2_showMsg(ST2_MSG_ATTACK);
-  luntu.classList.add("jump");
-  setTimeout(() => luntu.classList.remove("jump"), 300);
-
-  // メッセージを短時間表示
-  setTimeout(() => {
-    msgWindow.style.display = "none";
-
-    if (idx === st2CharIndex) {
-      st2_flash(null);
-      st2SelectedIndex = null;
-      st2_win();
-    } else {
-      if (!st2Missed.has(idx)) {
-        st2Missed.add(idx);
-        st2MissCount++;
-      }
-      w.style.display = "none";
-      st2_flash(null);
-      st2SelectedIndex = null;
-
-  if (st2MissCount >= 2) {
-    // ゲームオーバー前にミスメッセージを表示
-    st2_showMsg(ST2_MSG_MISS);
-    setTimeout(() => {
-      st2_gameover();
-    }, 1500); // 1.5秒後にゲームオーバー
-  } else {
-    st2_showMsg(ST2_MSG_MISS);
-  }
+    // 1回目クリック：選択＋移動＋点滅
+    if (st2SelectedIndex !== idx) {
+      st2SelectedIndex = idx;
+      st2Repeat = 0;
+      st2_flash(idx);
+      st2_moveLuntu(w);
+      return;
     }
-    stage2Enabled = true;  // クリック再有効化
-  }, 400);  // 攻撃メッセージ表示時間
-}
+
+    // 2回目クリック：攻撃
+    st2Repeat++;
+    if (st2Repeat >= 2) return;
+
+    stage2Enabled = false;  // クリックロック
+
+    // 攻撃メッセージ表示 + ルントウジャンプ
+    st2_showMsg(ST2_MSG_ATTACK);
+    luntu.classList.add("jump");
+    setTimeout(() => luntu.classList.remove("jump"), 300);
+
+    // メッセージを短時間表示
+    setTimeout(() => {
+      msgWindow.style.display = "none";
+
+      if (idx === st2CharIndex) {
+        st2_flash(null);
+        st2SelectedIndex = null;
+        st2_win();
+      } else {
+        if (!st2Missed.has(idx)) {
+          st2Missed.add(idx);
+          st2MissCount++;
+        }
+        w.style.display = "none";
+        st2_flash(null);
+        st2SelectedIndex = null;
+
+        if (st2MissCount >= 2) {
+          // 2回目ミスは即 gameover.js に移行
+          import('./gameover.js').then(module => {
+            module.showGameOver(resetToOpening);
+          });
+          return;
+        } else {
+          st2_showMsg(ST2_MSG_MISS);
+        }
+      }
+      stage2Enabled = true;  // クリック再有効化
+    }, 400);
+  }
 
   // 勝利の舞
   async function st2_clearDance() {
@@ -180,80 +180,6 @@ function st2_click(w, idx) {
       resetToOpening();
     });
   }
-
-// Stage2 ゲームオーバー演出
-async function st2_gameover() {
-  stage2Enabled = false;
-  removeStage2Watermelons();
-
-  // ミスメッセージ表示（任意で短時間固定表示）
-  st2_showMsg(ST2_MSG_MISS);
-
-  await new Promise(r => setTimeout(r, 1500)); // 1.5秒表示
-
-  // ゲームオーバー表示
-  msgImage.src = "gameover.png";
-  msgWindow.style.display = "block";
-
-  // deku 準備
-  deku.style.position = "absolute";
-  deku.style.opacity = 0;
-  deku.style.display = "block";
-  deku.style.visibility = "hidden";
-
-  const startLeft = luntu.offsetLeft;
-  const startTop  = luntu.offsetTop;
-  deku.style.left = startLeft + "px";
-  deku.style.top  = startTop + "px";
-  deku.style.visibility = "visible";
-
-  const followInterval = setInterval(() => {
-    deku.style.left = luntu.offsetLeft + "px";
-    deku.style.top  = luntu.offsetTop + "px";
-  }, 40);
-
-  // luntu 点滅
-  let intervalTime = 200;
-  for (let i = 0; i < 10; i++) {
-    luntu.style.opacity = i % 2 === 0 ? 1 : 0;
-    deku.style.opacity = 0;
-    await new Promise(r => setTimeout(r, intervalTime));
-  }
-
-  // luntu & deku 交互点滅
-  intervalTime = 200;
-  for (let i = 0; i < 20; i++) {
-    luntu.style.opacity = i % 2 === 0 ? 1 : 0;
-    deku.style.opacity  = i % 2 === 0 ? 0 : 1;
-    await new Promise(r => setTimeout(r, intervalTime));
-    if (i === 9) intervalTime = 120;
-    if (i === 14) intervalTime = 60;
-  }
-
-  // deku 点滅
-  luntu.style.opacity = 0;
-  intervalTime = 60;
-  for (let i = 0; i < 20; i++) {
-    deku.style.opacity = i % 2 === 0 ? 1 : 0;
-    await new Promise(r => setTimeout(r, intervalTime));
-    if (i === 9) intervalTime = 120;
-    if (i === 14) intervalTime = 200;
-  }
-
-  deku.style.opacity = 1;
-  clearInterval(followInterval);
-
-  // クリックで閉じる
-  await new Promise(r => setTimeout(r, 500));
-  msgWindow.onclick = () => {
-    msgWindow.style.display = "none";
-    deku.style.display = "none";
-    deku.style.opacity = 0;
-    luntu.style.opacity = 1;
-    luntu.style.display = "block";
-    resetToOpening();
-  };
-}
 
   // 初期化
   function st2_init() {
