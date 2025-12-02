@@ -140,9 +140,15 @@ function st2_click(w, idx) {
         msgWindow.onclick = null;
 
         // gameover.js の showGameOver を呼ぶ
-        import('./gameover.js').then(module => {
-          module.showGameOver(resetToOpening);
-        });
+import('./gameover.js').then(module => {
+    module.showGameOver(
+        luntu,
+        msgWindow,
+        msgImage,
+        resetToOpening
+    );
+});
+
 
         return; // ここで処理を止める
       } else {
