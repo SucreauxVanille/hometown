@@ -1,11 +1,11 @@
 // Stage2.js (gameover.js に委譲版)
 // 定数
-const ST2_MSG_ATTACK   = "attack.png";
-const ST2_MSG_HIT1     = "hit.png";
-const ST2_MSG_HIT2     = "hit2.png";
-const ST2_MSG_HIT3     = "hit3.png";
-const ST2_MSG_CLEAR    = "clear.png";
-const ST2_MSG_MISS     = "miss.png";
+window.ST2_MSG_ATTACK = "attack.png";
+window.ST2_MSG_HIT1   = "hit.png";
+window.ST2_MSG_HIT2   = "hit2.png";
+window.ST2_MSG_HIT3   = "hit3.png";
+window.ST2_MSG_CLEAR  = "clear.png";
+window.ST2_MSG_MISS   = "miss.png";
 
 // スイカ座標
 const ST2_POS = [
